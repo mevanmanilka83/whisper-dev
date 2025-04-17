@@ -1,3 +1,5 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
@@ -7,38 +9,38 @@ import { Button } from "@/components/ui/button";
 
 export default function CreateDropCard() {
   return (
-    <Card className="p-4 border-none shadow-md rounded-2xl">
-      <div className="flex items-center gap-3">
-        <div className="relative h-10 w-10 flex-shrink-0">
+    <Card className="p-3 border-none shadow-sm rounded-lg">
+      <div className="flex items-center gap-2">
+        <div className="relative h-8 w-8 flex-shrink-0">
           <Image
             src="/whisper.jpg"
             alt="User avatar"
             fill
-            className="object-cover rounded-full border-2 border-primary/20"
+            className="object-cover rounded-full"
           />
         </div>
         <div className="flex-1">
           <Link href="/communities/VR_46/post" className="w-full block">
             <Input
               placeholder="Drop your thoughts..."
-              className="w-full bg-muted/30 hover:bg-muted/50 transition-colors rounded-full border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+              className="w-full bg-muted/20 hover:bg-muted/30 transition-colors rounded-md border-none focus-visible:ring-0 h-9 text-sm"
             />
           </Link>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-full hover:bg-muted/80 h-10 w-10"
+            className="rounded-md hover:bg-muted/20 h-8 w-8 text-muted-foreground"
           >
-            <ImageIcon className="w-5 h-5" />
+            <ImageIcon className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-full bg-primary text-white hover:bg-primary/90 h-10 w-10"
+            className="rounded-md bg-primary/10 text-primary hover:bg-primary/20 h-8 w-8"
           >
-            <Link2 className="w-5 h-5" />
+            <Link2 className="w-4 h-4" />
           </Button>
         </div>
       </div>
