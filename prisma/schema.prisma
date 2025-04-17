@@ -53,7 +53,7 @@ model Session {
 
 model Zone {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String   @unique // This ensures zone names are globally unique across ALL users
+  name        String   @unique
   subName     String?
   description String?
   createdAt   DateTime @default(now())
@@ -62,7 +62,6 @@ model Zone {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   points      Point[]
 
-  // This ensures subName is unique within each zone
   @@unique([name, subName])
 }
 
@@ -77,7 +76,7 @@ model Point {
   user        User?    @relation(fields: [userId], references: [id])
   zoneId      String?  @db.ObjectId
   zone        Zone?    @relation(fields: [zoneId], references: [id])
-  subName     String? // Keep this field for additional categorization
+  subName     String?
 
   @@index([title])
 }
