@@ -28,11 +28,12 @@ async function getData() {
   });
   return data;
 }
+
 export default async function Home() {
   const data = await getData();
   return (
-    <div className="max-w-[1000px] mx-auto flex flex-row gap-x-10 mt-4">
-      <div className="w-[65%] flex flex-col gap-y-5">
+    <div className="max-w-[1000px] mx-auto flex flex-col md:flex-row gap-5 p-4">
+      <div className="w-full md:w-[65%] flex flex-col gap-5">
         <CreateDropCard />
         {data.map((point) => (
           <DropCard
@@ -47,21 +48,21 @@ export default async function Home() {
         ))}
       </div>
 
-      <div className="w-[35%]">
-        <Card className="pt-1">
+      <div className="w-full md:w-[35%] sticky top-4 h-fit">
+        <Card className="overflow-hidden border-none shadow-md rounded-2xl">
           <div className="relative">
             <Image
-              src={Banner || "/placeholder.svg"}
+              src={Banner || "/placeholder.svg?height=128&width=400"}
               alt="Banner"
               className="w-full h-32 object-cover"
               width={400}
               height={128}
             />
 
-            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/40 to-transparent p-3">
+            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent p-3">
               <div className="flex items-center">
                 <Image
-                  src={whisper || "/placeholder.svg"}
+                  src={whisper || "/placeholder.svg?height=40&width=40"}
                   alt="Whisper logo"
                   className="w-10 h-10 rounded-full border-2 border-white"
                   width={40}
@@ -69,23 +70,30 @@ export default async function Home() {
                 />
                 <h1 className="font-medium pl-3 text-white">Home</h1>
               </div>
-              <p className="text-sm text-white/80 mt-1">Your Own Drop Point</p>
+              <p className="text-sm text-white/90 mt-1">Your Own Drop Point</p>
             </div>
           </div>
 
-          <div className="p-4">
-            <Separator className="mb-4" />
+          <div className="p-5">
+            <Separator className="mb-5" />
             <p className="text-center text-sm text-muted-foreground mb-6">
-              Whisper is a secure platform that allows users to zones where
-              users can share thoughts, media, and engage in discussions.
+              Whisper is a secure platform that allows users to create zones
+              where users can share thoughts, media, and engage in discussions.
             </p>
 
-            <div className="flex flex-col gap-y-2">
-              <Button asChild variant="secondary" className="w-full">
+            <div className="flex flex-col gap-y-3">
+              <Button
+                asChild
+                variant="outline"
+                className="w-full rounded-full border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors"
+              >
                 <Link href="/communities/create">Setup Zone</Link>
               </Button>
 
-              <Button asChild className="w-full ">
+              <Button
+                asChild
+                className="w-full rounded-full bg-primary hover:bg-primary/90 transition-colors"
+              >
                 <Link href="/communities/VR_46/post">Drop Point</Link>
               </Button>
             </div>
