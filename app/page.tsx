@@ -53,14 +53,17 @@ export default async function Home() {
                   image={point.image}
                   subName={point.subName}
                   createdAt={point.createdAt}
-                  boostCount={point.Boost.reduce((acc, boost) => {
-                    if (boost.type === "Boost") {
-                      return acc + 1;
-                    } else if (boost.type === "Reduce") {
-                      return acc - 1;
-                    }
-                    return acc;
-                  }, 0)}
+                  boostCount={Math.max(
+                    0,
+                    point.Boost.reduce((acc, boost) => {
+                      if (boost.type === "Boost") {
+                        return acc + 1;
+                      } else if (boost.type === "Reduce") {
+                        return acc - 1;
+                      }
+                      return acc;
+                    }, 0)
+                  )}
                 />
               ))}
             </div>

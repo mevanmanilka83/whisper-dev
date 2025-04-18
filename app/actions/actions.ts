@@ -5,6 +5,7 @@ import { auth } from "../utils/auth";
 import { prisma } from "../utils/db";
 import { Prisma, TypeOfBoost } from "@prisma/client";
 import type { JSONContent } from "@tiptap/react";
+import { revalidatePath } from "next/cache";
 
 type ActionState = {
   message: string;
@@ -252,44 +253,108 @@ export async function handleBoost(formData: FormData) {
   }
 
   const pointId = formData.get("pointId")?.toString().trim();
-  const boostDirection = formData.get("boostDirection") as TypeOfBoost;
+  const boostDirection = formData.get("boostDirection")?.toString() as TypeOfBoost;
 
   if (!pointId) {
     throw new Error("Point ID is required");
   }
 
-  const boost = await prisma.boost.findFirst({
-    where: {
-      pointId: pointId,
-      userId: session.user.id,
-    },
-  });
-
-  if (boost) {
-    if (boost.type === boostDirection) {
-      await prisma.boost.delete({
-        where: {
-          id: boost.id,
-        },
-      });
-    } else {
-      await prisma.boost.update({
-        where: {
-          id: boost.id,
-        },
-        data: {
-          type: boostDirection,
-        },
-      });
-    }
-  } else {
-    // If no existing boost, create a new one
-    await prisma.boost.create({
-      data: {
-        pointId,
+  try {
+    // Find the user's existing boost/reduce for this point
+    const existingBoost = await prisma.boost.findFirst({
+      where: {
+        pointId: pointId,
         userId: session.user.id,
-        type: boostDirection,
       },
     });
+
+    // CASE 1: User has an existing boost/reduce action
+    if (existingBoost) {
+      // If user clicks the same button they previously clicked, remove their action completely
+      if (existingBoost.type === boostDirection) {
+        await prisma.boost.delete({
+          where: { id: existingBoost.id }
+        });
+      }
+      // If user is switching from Boost to Reduce, check if it would make the count go negative
+      else if (boostDirection === "Reduce") {
+        // Count all boosts excluding the user's current one (since it's a Boost that will be changed)
+        const otherBoosts = await prisma.boost.findMany({
+          where: {
+            pointId: pointId,
+            type: "Boost",
+            NOT: { id: existingBoost.id }
+          }
+        });
+        
+        const otherReduces = await prisma.boost.findMany({
+          where: {
+            pointId: pointId,
+            type: "Reduce"
+          }
+        });
+        
+        // Calculate if this would make count negative
+        if (otherBoosts.length <= otherReduces.length) {
+          // If it would go negative, just remove the user's boost
+          await prisma.boost.delete({
+            where: { id: existingBoost.id }
+          });
+        } else {
+          // Safe to change to Reduce
+          await prisma.boost.update({
+            where: { id: existingBoost.id },
+            data: { type: boostDirection }
+          });
+        }
+      }
+      // User is switching from Reduce to Boost (always allowed)
+      else {
+        await prisma.boost.update({
+          where: { id: existingBoost.id },
+          data: { type: boostDirection }
+        });
+      }
+    }
+    // CASE 2: User doesn't have an existing boost/reduce action
+    else {
+      // If user is trying to Reduce, check if it would make count negative
+      if (boostDirection === "Reduce") {
+        const boostCount = await prisma.boost.count({
+          where: {
+            pointId: pointId,
+            type: "Boost"
+          }
+        });
+        
+        const reduceCount = await prisma.boost.count({
+          where: {
+            pointId: pointId,
+            type: "Reduce"
+          }
+        });
+        
+        // Don't allow a new Reduce if it would make the count go negative
+        if (boostCount <= reduceCount) {
+          revalidatePath("/");
+          return;
+        }
+      }
+      
+      // Safe to create a new action
+      await prisma.boost.create({
+        data: {
+          pointId,
+          userId: session.user.id,
+          type: boostDirection
+        }
+      });
+    }
+    
+    // Always refresh the page at the end
+    revalidatePath("/");
+  } catch (error) {
+    console.error("Error handling boost action:", error);
+    revalidatePath("/");
   }
 }
