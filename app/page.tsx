@@ -24,6 +24,9 @@ async function getData() {
       },
       subName: true,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
   return data;
 }
@@ -56,12 +59,7 @@ export default async function Home() {
                   boostCount={Math.max(
                     0,
                     point.Boost.reduce((acc, boost) => {
-                      if (boost.type === "Boost") {
-                        return acc + 1;
-                      } else if (boost.type === "Reduce") {
-                        return acc - 1;
-                      }
-                      return acc;
+                      return boost.type === "Boost" ? acc + 1 : acc - 1;
                     }, 0)
                   )}
                 />

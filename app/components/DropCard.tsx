@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import CopyLink from "./CopyLink";
 import { handleBoost } from "../actions/actions";
+import Render from "./Render";
 
 interface DropCardProps {
   title: string;
@@ -66,13 +67,7 @@ export default function DropCard({
             {title}
           </h2>
 
-          {jsonContent && (
-            <div className="text-xs text-muted-foreground line-clamp-2 mb-2">
-              {typeof jsonContent === "string"
-                ? jsonContent
-                : JSON.stringify(jsonContent)}
-            </div>
-          )}
+          <Render data={jsonContent} />
 
           {image && (
             <div className="mt-2 mb-2 rounded-md overflow-hidden max-h-[300px] bg-muted/20">
