@@ -86,7 +86,7 @@ export default function DropCard({
 
         <div className="flex items-center mt-3 gap-2">
           <div className="flex items-center">
-            <form>
+            <form action="">
               <Button
                 variant="ghost"
                 size="sm"
@@ -98,6 +98,8 @@ export default function DropCard({
             </form>
             <span>0</span>
             <form>
+              <span>0</span>
+
               <Button
                 variant="ghost"
                 size="sm"
