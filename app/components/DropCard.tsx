@@ -18,6 +18,7 @@ interface DropCardProps {
   id: string;
   image: string | null;
   subName: string | null;
+  boostCount: number;
 }
 
 export default function DropCard({
@@ -27,6 +28,7 @@ export default function DropCard({
   createdAt,
   image,
   subName,
+  boostCount,
 }: DropCardProps) {
   const formattedDate = createdAt
     ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
@@ -100,7 +102,7 @@ export default function DropCard({
                 <Rocket className="w-4 h-4" />
               </Button>
             </form>
-            <span>0</span>
+            <span>{boostCount}</span>
             <form action={handleBoost}>
               <input type="hidden" name="boostDirection" value="Reduce" />
               <input type="hidden" name="pointId" value={id} />
