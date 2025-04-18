@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "../utils/auth";
 import { prisma } from "../utils/db";
-import { Prisma } from "@prisma/client";
+import { Prisma, TypeOfBoost } from "@prisma/client";
 import type { JSONContent } from "@tiptap/react";
 
 type ActionState = {
@@ -241,5 +241,52 @@ export async function createPoint(
       }
     }
     return { error: "Failed to create point" };
+  }
+}
+
+export async function handleBoost(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user) {
+    return redirect("/api/auth/signin");
+  }
+  const pointId = formData.get("pointId")?.toString().trim();
+  const boostDirection = formData.get("boostDirection") as TypeOfBoost;
+
+  const boost = await prisma.boost.findFirst({
+    where: {
+      pointId: pointId,
+      userId: session.user.id,
+    },
+  });
+
+  if (boost) {
+    if (boost.type === boostDirection) {
+      // If user clicks the same boost/reduce button again, remove the boost
+      await prisma.boost.delete({
+        where: {
+          id: boost.id,
+        },
+      });
+    } else {
+      // If user changes from boost to reduce or vice versa
+      await prisma.boost.update({
+        where: {
+          id: boost.id,
+        },
+        data: {
+          type: boostDirection,
+        },
+      });
+    }
+  } else {
+    // If no existing boost, create a new one
+    await prisma.boost.create({
+      data: {
+        pointId,
+        userId: session.user.id,
+        type: boostDirection,
+      },
+    });
   }
 }
