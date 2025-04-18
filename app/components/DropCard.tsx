@@ -86,23 +86,27 @@ export default function DropCard({
 
         <div className="flex items-center mt-3 gap-2">
           <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-md hover:bg-primary/5 hover:text-primary transition-colors h-7 w-7 p-0"
-              title="Boost"
-            >
-              <Rocket className="w-4 h-4" />
-            </Button>
+            <form>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-md hover:bg-primary/5 hover:text-primary transition-colors h-7 w-7 p-0"
+                title="Boost"
+              >
+                <Rocket className="w-4 h-4" />
+              </Button>
+            </form>
             <span>0</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-md hover:bg-destructive/5 hover:text-destructive transition-colors h-7 w-7 p-0"
-              title="Reduce"
-            >
-              <Anchor className="w-4 h-4" />{" "}
-            </Button>
+            <form>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-md hover:bg-destructive/5 hover:text-destructive transition-colors h-7 w-7 p-0"
+                title="Reduce"
+              >
+                <Anchor className="w-4 h-4" />{" "}
+              </Button>
+            </form>
           </div>
           <div className="h-4 w-px bg-muted/50 mx-1"></div>
           <div className="flex items-center gap-x-5">
