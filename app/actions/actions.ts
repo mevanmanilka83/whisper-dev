@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "../utils/auth";
 import { prisma } from "../utils/db";
-import { Prisma } from "@prisma/client";
+import { Prisma, TypeOfBoost } from "@prisma/client";
 import type { JSONContent } from "@tiptap/react";
 
 type ActionState = {
@@ -241,5 +241,36 @@ export async function createPoint(
       }
     }
     return { error: "Failed to create point" };
+  }
+}
+export async function handleBoost(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user) {
+    return redirect("/api/auth/signin");
+  }
+  const pointId = formData.get("pointId")?.toString().trim();
+  const voteDirection = formData.get("voteDirection") as TypeOfBoost;
+
+  const boost = await prisma.boost.findFirst({
+    where: {
+      pointId: pointId,
+      userId: session.user.id,
+    },
+  });
+  if (boost) {
+    await prisma.boost.delete({
+      where: {
+        id: boost.id,
+      },
+    });
+  } else {
+    await prisma.boost.create({
+      data: {
+        type: voteDirection,
+        pointId: pointId,
+        userId: session.user.id,
+      },
+    });
   }
 }
