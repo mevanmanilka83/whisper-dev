@@ -2,12 +2,13 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Rocket, Anchor, MessageSquare, Share } from "lucide-react";
+import { Rocket, Anchor, MessageSquare } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+
+import CopyLink from "./CopyLink";
 
 interface DropCardProps {
   title: string;
@@ -26,18 +27,9 @@ export default function DropCard({
   image,
   subName,
 }: DropCardProps) {
-  const [votes, setVotes] = useState(0);
   const formattedDate = createdAt
     ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
     : "";
-
-  const handleBoost = () => {
-    setVotes((prev) => prev + 1);
-  };
-
-  const handleReduce = () => {
-    setVotes((prev) => prev - 1);
-  };
 
   return (
     <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-200 rounded-lg">
@@ -97,52 +89,33 @@ export default function DropCard({
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleBoost}
               className="rounded-md hover:bg-primary/5 hover:text-primary transition-colors h-7 w-7 p-0"
               title="Boost"
             >
               <Rocket className="w-4 h-4" />
             </Button>
-            <span
-              className={`text-xs font-medium px-1 min-w-[20px] text-center ${
-                votes > 0
-                  ? "text-primary"
-                  : votes < 0
-                  ? "text-destructive"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {votes}
-            </span>
+            <span>0</span>
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleReduce}
               className="rounded-md hover:bg-destructive/5 hover:text-destructive transition-colors h-7 w-7 p-0"
               title="Reduce"
             >
               <Anchor className="w-4 h-4" />{" "}
             </Button>
           </div>
-
           <div className="h-4 w-px bg-muted/50 mx-1"></div>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors px-2"
-          >
-            <MessageSquare className="w-3.5 h-3.5 mr-1" />
-            <span className="text-xs">40</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors px-2 ml-auto"
-          >
-            <Share className="w-3.5 h-3.5" />
-          </Button>
+          <div className="flex items-center gap-x-5">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors px-2 ml-auto"
+            >
+              <MessageSquare className="w-3.5 h-3.5 mr-1" />
+              <span className="text-xs">40 comments</span>
+            </Button>
+          </div>
+          <CopyLink id={id} />
         </div>
       </div>
     </Card>

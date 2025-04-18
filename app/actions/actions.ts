@@ -40,7 +40,7 @@ export async function createZone(prevState: ActionState, formData: FormData) {
     return {
       message: "Zone created successfully!",
       error: false,
-      zoneId: zone.name, // Using zone name as the URL parameter
+      zoneId: zone.name,
     };
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -69,7 +69,6 @@ export async function deleteZone(prevState: ActionState, formData: FormData) {
       throw new Error("Zone ID is required.");
     }
 
-    // First verify that the zone belongs to the user
     const existingZone = await prisma.zone.findUnique({
       where: { id: zoneId },
     });
@@ -109,7 +108,6 @@ export async function updateZone(prevState: ActionState, formData: FormData) {
       throw new Error("Zone ID and name are required.");
     }
 
-    // First verify that the zone belongs to the user
     const existingZone = await prisma.zone.findUnique({
       where: { id: zoneId },
     });
@@ -163,7 +161,6 @@ export async function updateDescription(
       throw new Error("Zone ID and description are required.");
     }
 
-    // First verify that the zone belongs to the user
     const existingZone = await prisma.zone.findUnique({
       where: { id: zoneId },
     });
@@ -204,14 +201,13 @@ export async function createPoint(
   try {
     const title = formData.get("title")?.toString().trim() || "Untitled";
     const imageUrl = formData.get("imageUrl")?.toString() || null;
-    const zoneName = formData.get("zoneId")?.toString() || null; // This is actually the zone name from the URL
+    const zoneName = formData.get("zoneId")?.toString() || null;
     const subName = formData.get("subName")?.toString() || null;
 
     if (!zoneName) {
       throw new Error("Zone name is required.");
     }
 
-    // Find the zone by name to get its ID
     const zone = await prisma.zone.findUnique({
       where: { name: zoneName },
     });
@@ -227,7 +223,7 @@ export async function createPoint(
         image: imageUrl,
         subName,
         userId: session.user.id,
-        zoneId: zone.id, // Use the resolved zone ID
+        zoneId: zone.id,
       },
     });
 

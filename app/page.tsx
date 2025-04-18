@@ -32,7 +32,6 @@ export default async function Home() {
   return (
     <div className="container max-w-5xl mx-auto py-6 px-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Main content */}
         <div className="md:col-span-2 space-y-4">
           <CreateDropCard />
 
@@ -59,7 +58,6 @@ export default async function Home() {
           )}
         </div>
 
-        {/* Sidebar */}
         <div className="md:col-span-1">
           <div className="sticky top-6">
             <Card className="overflow-hidden border-none shadow-sm rounded-lg">

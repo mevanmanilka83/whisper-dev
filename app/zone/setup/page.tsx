@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { createZone } from "@/app/actions/actions";
 import { toast } from "sonner";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -25,7 +25,7 @@ const initialState: ActionState = {
 export default function Page() {
   const { status } = useSession();
   const router = useRouter();
-  const [state, formAction] = useFormState(createZone, initialState);
+  const [state, formAction] = useActionState(createZone, initialState);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -39,7 +39,7 @@ export default function Page() {
         toast.success("Success", {
           description: state.message || "Zone created successfully!",
         });
-        // Add a small delay before navigation to ensure toast is visible
+
         setTimeout(() => {
           router.push(`/zone/${state.zoneId}`);
         }, 500);
