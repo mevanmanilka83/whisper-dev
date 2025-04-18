@@ -243,22 +243,20 @@ export async function createPoint(
     return { error: "Failed to create point" };
   }
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> d942e7391012f3886d6faed531f0ba95255e56de
 export async function handleBoost(formData: FormData) {
   const session = await auth();
 
   if (!session?.user) {
     return redirect("/api/auth/signin");
   }
+
   const pointId = formData.get("pointId")?.toString().trim();
-<<<<<<< HEAD
-  const voteDirection = formData.get("voteDirection") as TypeOfBoost;
-=======
   const boostDirection = formData.get("boostDirection") as TypeOfBoost;
->>>>>>> d942e7391012f3886d6faed531f0ba95255e56de
+
+  if (!pointId) {
+    throw new Error("Point ID is required");
+  }
 
   const boost = await prisma.boost.findFirst({
     where: {
@@ -266,31 +264,15 @@ export async function handleBoost(formData: FormData) {
       userId: session.user.id,
     },
   });
-<<<<<<< HEAD
-  if (boost) {
-    await prisma.boost.delete({
-      where: {
-        id: boost.id,
-      },
-    });
-  } else {
-    await prisma.boost.create({
-      data: {
-        type: voteDirection,
-        pointId: pointId,
-        userId: session.user.id,
-=======
 
   if (boost) {
     if (boost.type === boostDirection) {
-      // If user clicks the same boost/reduce button again, remove the boost
       await prisma.boost.delete({
         where: {
           id: boost.id,
         },
       });
     } else {
-      // If user changes from boost to reduce or vice versa
       await prisma.boost.update({
         where: {
           id: boost.id,
@@ -307,7 +289,6 @@ export async function handleBoost(formData: FormData) {
         pointId,
         userId: session.user.id,
         type: boostDirection,
->>>>>>> d942e7391012f3886d6faed531f0ba95255e56de
       },
     });
   }

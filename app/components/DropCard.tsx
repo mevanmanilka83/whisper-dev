@@ -9,6 +9,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 
 import CopyLink from "./CopyLink";
+import { handleBoost } from "../actions/actions";
 
 interface DropCardProps {
   title: string;
@@ -86,25 +87,29 @@ export default function DropCard({
 
         <div className="flex items-center mt-3 gap-2">
           <div className="flex items-center">
-            <form action="">
+            <form action={handleBoost}>
+              <input type="hidden" name="boostDirection" value="Boost" />
+              <input type="hidden" name="pointId" value={id} />
               <Button
                 variant="ghost"
                 size="sm"
                 className="rounded-md hover:bg-primary/5 hover:text-primary transition-colors h-7 w-7 p-0"
                 title="Boost"
+                type="submit"
               >
                 <Rocket className="w-4 h-4" />
               </Button>
             </form>
             <span>0</span>
-            <form>
-              <span>0</span>
-
+            <form action={handleBoost}>
+              <input type="hidden" name="boostDirection" value="Reduce" />
+              <input type="hidden" name="pointId" value={id} />
               <Button
                 variant="ghost"
                 size="sm"
                 className="rounded-md hover:bg-destructive/5 hover:text-destructive transition-colors h-7 w-7 p-0"
                 title="Reduce"
+                type="submit"
               >
                 <Anchor className="w-4 h-4" />{" "}
               </Button>
