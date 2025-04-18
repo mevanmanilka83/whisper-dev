@@ -6,6 +6,8 @@ import Link from "next/link";
 import CreateDropCard from "./components/CreateDropCard";
 import { prisma } from "./utils/db";
 import DropCard from "./components/DropCard";
+import { Suspense } from "react";
+import SkeltonCard from "./components/SkeltonCard";
 
 async function getData() {
   const data = await prisma.point.findMany({
@@ -31,41 +33,67 @@ async function getData() {
   return data;
 }
 
-export default async function Home() {
+async function ShowItems() {
   const data = await getData();
+  return (
+    <>
+      {data.length === 0 ? (
+        <Card className="p-6 text-center border-none bg-muted/20">
+          <p className="text-muted-foreground">
+            No drops yet. Be the first to create one!
+          </p>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {data.map((point) => {
+            let parsedContent = null;
+            if (point.textContent) {
+              try {
+                parsedContent =
+                  typeof point.textContent === "string"
+                    ? JSON.parse(point.textContent)
+                    : point.textContent;
+              } catch (e) {
+                console.error(
+                  `Error parsing content for point ${point.id}:`,
+                  e
+                );
+              }
+            }
+
+            return (
+              <DropCard
+                key={point.id}
+                id={point.id}
+                title={point.title}
+                jsonContent={parsedContent}
+                image={point.image}
+                subName={point.subName}
+                createdAt={point.createdAt}
+                boostCount={Math.max(
+                  0,
+                  point.Boost.reduce((acc, boost) => {
+                    return boost.type === "Boost" ? acc + 1 : acc - 1;
+                  }, 0)
+                )}
+              />
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
+}
+
+export default function Home() {
   return (
     <div className="container max-w-5xl mx-auto py-6 px-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="md:col-span-2 space-y-4">
           <CreateDropCard />
-
-          {data.length === 0 ? (
-            <Card className="p-6 text-center border-none bg-muted/20">
-              <p className="text-muted-foreground">
-                No drops yet. Be the first to create one!
-              </p>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {data.map((point) => (
-                <DropCard
-                  key={point.id}
-                  id={point.id}
-                  title={point.title}
-                  jsonContent={point.textContent}
-                  image={point.image}
-                  subName={point.subName}
-                  createdAt={point.createdAt}
-                  boostCount={Math.max(
-                    0,
-                    point.Boost.reduce((acc, boost) => {
-                      return boost.type === "Boost" ? acc + 1 : acc - 1;
-                    }, 0)
-                  )}
-                />
-              ))}
-            </div>
-          )}
+          <Suspense fallback={<SkeltonCard />}>
+            <ShowItems />
+          </Suspense>
         </div>
 
         <div className="md:col-span-1">

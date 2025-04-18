@@ -34,7 +34,6 @@ interface PointViewerProps {
 }
 
 export default function PointViewer({ point }: PointViewerProps) {
-  // Parse the JSON content if it exists
   let jsonContent: JSONContent | null = null;
   try {
     if (point.textContent) {
