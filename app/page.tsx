@@ -8,9 +8,11 @@ import { prisma } from "./utils/db";
 import DropCard from "./components/DropCard";
 import { Suspense } from "react";
 import SkeltonCard from "./components/SkeltonCard";
+import Pagination from "./components/Pagination";
 
 async function getData() {
   const data = await prisma.point.findMany({
+    take: 1,
     select: {
       title: true,
       createdAt: true,
@@ -81,6 +83,7 @@ async function ShowItems() {
           })}
         </div>
       )}
+      <Pagination totalPages={5} />
     </>
   );
 }
