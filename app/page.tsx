@@ -10,33 +10,42 @@ import { Suspense } from "react";
 import SkeltonCard from "./components/SkeltonCard";
 import Pagination from "./components/Pagination";
 
-async function getData() {
-  const data = await prisma.point.findMany({
-    take: 1,
-    select: {
-      title: true,
-      createdAt: true,
-      id: true,
-      textContent: true,
-      image: true,
-      Boost: true,
-      user: {
-        select: {
-          name: true,
-          image: true,
+const ITEMS_PER_PAGE = 1;
+
+async function getData(page: number = 1) {
+  const skip = (page - 1) * ITEMS_PER_PAGE;
+
+  const [count, data] = await prisma.$transaction([
+    prisma.point.count(),
+    prisma.point.findMany({
+      take: ITEMS_PER_PAGE,
+      skip,
+      select: {
+        title: true,
+        createdAt: true,
+        id: true,
+        textContent: true,
+        image: true,
+        Boost: true,
+        user: {
+          select: {
+            name: true,
+            image: true,
+          },
         },
+        subName: true,
       },
-      subName: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-  return data;
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+  ]);
+  return { count, data };
 }
 
-async function ShowItems() {
-  const data = await getData();
+async function ShowItems({ page }: { page: number }) {
+  const { count, data } = await getData(page);
+
   return (
     <>
       {data.length === 0 ? (
@@ -83,19 +92,25 @@ async function ShowItems() {
           })}
         </div>
       )}
-      <Pagination totalPages={5} />
+      <Pagination totalPages={Math.ceil(count / ITEMS_PER_PAGE)} />
     </>
   );
 }
 
-export default function Home() {
+export default function Home({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
+  const currentPage = Number(searchParams.page) || 1;
+
   return (
     <div className="container max-w-5xl mx-auto py-6 px-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="md:col-span-2 space-y-4">
           <CreateDropCard />
           <Suspense fallback={<SkeltonCard />}>
-            <ShowItems />
+            <ShowItems page={currentPage} />
           </Suspense>
         </div>
 
