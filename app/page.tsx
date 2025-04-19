@@ -10,7 +10,7 @@ import { Suspense } from "react";
 import SkeltonCard from "./components/SkeltonCard";
 import Pagination from "./components/Pagination";
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 2;
 
 async function getData(page: number = 1) {
   const skip = (page - 1) * ITEMS_PER_PAGE;
@@ -19,7 +19,7 @@ async function getData(page: number = 1) {
     prisma.point.count(),
     prisma.point.findMany({
       take: ITEMS_PER_PAGE,
-      skip,
+      skip: skip,
       select: {
         title: true,
         createdAt: true,
