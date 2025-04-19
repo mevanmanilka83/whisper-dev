@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import {
   Card,
@@ -25,6 +25,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import SubmitButton from "@/app/components/SubmitButton";
 import EditorComponent from "@/app/components/Editor";
@@ -72,17 +73,32 @@ export default function CreatePostRoute({
   params: Promise<{ id: string }>;
 }) {
   const resolvedParams = React.use(params) as { id: string };
-
+  const { status } = useSession();
+  const router = useRouter();
   const [imageUrl, setImageUrl] = React.useState<string>("");
   const [json, setJson] = React.useState<JSONContent | null>(null);
   const [title, setTitle] = React.useState<string>("");
   const [error, setError] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/sign-in");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-2xl font-semibold">Loading...</h1>
+      </div>
+    );
+  }
+
   const createPointZone = createPoint.bind(null, { jsonContent: json });
-  const router = useRouter();
 
   const handleSubmit = async (formData: FormData) => {
     setError(null);
-    // Make sure to include the imageUrl in the form data
+
     formData.set("imageUrl", imageUrl);
     const response = await createPointZone(formData);
 
