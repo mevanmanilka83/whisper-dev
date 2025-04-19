@@ -187,8 +187,9 @@ export default async function ZonePage({
   params: { id: string };
   searchParams: { page?: string };
 }) {
-  const { id } = params;
-  const currentPage = Number(searchParams.page) || 1;
+  const { id } = await params;
+  const page = await searchParams.page;
+  const currentPage = Number(page) || 1;
   const session = await auth();
 
   // Pass the user ID to getZoneData if available

@@ -97,12 +97,13 @@ async function ShowItems({ page }: { page: number }) {
   );
 }
 
-export default function Home({
+export default async function Home({
   searchParams,
 }: {
   searchParams: { page?: string };
 }) {
-  const currentPage = Number(searchParams.page) || 1;
+  const page = await searchParams.page;
+  const currentPage = Number(page) || 1;
 
   return (
     <div className="container max-w-5xl mx-auto py-6 px-4">
