@@ -10,7 +10,7 @@ import { Suspense } from "react";
 import SkeltonCard from "./components/SkeltonCard";
 import Pagination from "./components/Pagination";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 5;
 
 async function getData(page: number = 1) {
   const skip = (page - 1) * ITEMS_PER_PAGE;
@@ -110,7 +110,7 @@ export default async function Home({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="md:col-span-2 space-y-4">
           <CreateDropCard />
-          <Suspense fallback={<SkeltonCard />}>
+          <Suspense fallback={<SkeltonCard />} key={searchParams.page}>
             <ShowItems page={currentPage} />
           </Suspense>
         </div>

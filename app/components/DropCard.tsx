@@ -62,7 +62,7 @@ export default function DropCard({
           <span>{formattedDate}</span>
         </div>
 
-        <Link href={`/post/${id}`} className="block group">
+        <Link href={`/drop/${id}`} className="block group">
           <h2 className="text-base font-medium group-hover:text-primary transition-colors mb-2">
             {title}
           </h2>
