@@ -1,99 +1,86 @@
+"use client"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
-
-import { LogOut } from "lucide-react";
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
-import { signOut } from "../utils/auth";
-import { redirect } from "next/navigation";
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { LogOut, Settings, User } from "lucide-react"
+import { signOut } from "next-auth/react"
 
 interface UserDropdownProps {
-  userImage: string;
-  userName: string;
-  userEmail: string;
+  userImage: string
+  userName: string
+  userEmail: string
 }
 
-export default function UserDropdown({
-  userImage,
-  userName,
-  userEmail,
-}: UserDropdownProps) {
+export default function UserDropdown({ userImage, userName, userEmail }: UserDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="h-auto p-2 hover:bg-transparent flex items-center gap-2"
+          className="relative h-10 w-10 rounded-full hover:bg-accent/50 transition-all duration-200 hover:scale-105 ring-2 ring-transparent hover:ring-primary/20 focus-visible:ring-primary/20"
         >
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={userImage} alt={userName} />
-            <AvatarFallback>
-              {userName?.charAt(0)?.toUpperCase() || "U"}
+          <Avatar className="h-9 w-9 shadow-md ring-1 ring-border/20">
+            <AvatarImage src={userImage || "/placeholder.svg"} alt={userName} />
+            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold text-sm">
+              {userName ? userName.charAt(0).toUpperCase() : "U"}
             </AvatarFallback>
           </Avatar>
-          <ChevronDown
-            size={16}
-            strokeWidth={2}
-            className="opacity-60"
-            aria-hidden="true"
-          />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="flex min-w-0 flex-col px-4 py-3">
-          <span className="truncate text-sm font-medium text-foreground">
-            {userName}
-          </span>
-          <span className="truncate text-xs text-muted-foreground">
-            {userEmail}
-          </span>
+      <DropdownMenuContent
+        className="w-64 shadow-xl border border-border/50 bg-background/95 backdrop-blur-sm rounded-lg"
+        align="end"
+        forceMount
+        sideOffset={8}
+      >
+        <DropdownMenuLabel className="font-normal p-4">
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-10 w-10 shadow-sm">
+                <AvatarImage src={userImage || "/placeholder.svg"} alt={userName} />
+                <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold">
+                  {userName ? userName.charAt(0).toUpperCase() : "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-semibold leading-none">{userName || "User"}</p>
+                <p className="text-xs leading-none text-muted-foreground truncate max-w-[150px]">
+                  {userEmail || "No email"}
+                </p>
+              </div>
+            </div>
+          </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem asChild className="py-2 px-4 focus:bg-accent">
-          <Link href="/zone/setup" className="w-full flex items-center">
-            Setup Zone
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild className="py-2 px-4 focus:bg-accent">
-          <Link href="/zone/point" className="w-full flex items-center">
-            Drop Point
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild className="py-2 px-4 focus:bg-accent">
-          <form
-            className="w-full"
-            action={async () => {
-              "use server";
-              await signOut();
-              redirect("/");
-            }}
+        <DropdownMenuSeparator className="mx-2" />
+        <div className="p-1">
+          <DropdownMenuItem className="cursor-pointer hover:bg-accent/50 transition-colors rounded-md p-3">
+            <User className="mr-3 h-4 w-4 text-muted-foreground" />
+            <span className="font-medium">Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer hover:bg-accent/50 transition-colors rounded-md p-3">
+            <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
+            <span className="font-medium">Settings</span>
+          </DropdownMenuItem>
+        </div>
+        <DropdownMenuSeparator className="mx-2" />
+        <div className="p-1">
+          <DropdownMenuItem
+            className="cursor-pointer hover:bg-destructive/10 hover:text-destructive transition-colors rounded-md p-3"
+            onClick={() => signOut()}
           >
-            <button
-              type="submit"
-              className="flex w-full items-center gap-2 focus-visible:ring-0 focus-visible:ring-offset-0"
-            >
-              <LogOut
-                size={16}
-                strokeWidth={2}
-                className="opacity-60"
-                aria-hidden="true"
-              />
-              <span>Sign Out</span>
-            </button>
-          </form>
-        </DropdownMenuItem>
+            <LogOut className="mr-3 h-4 w-4" />
+            <span className="font-medium">Log out</span>
+          </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }
