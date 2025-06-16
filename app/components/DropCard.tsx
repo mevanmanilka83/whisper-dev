@@ -35,6 +35,12 @@ export default function DropCard({
     ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
     : "";
 
+  // Ensure jsonContent is properly parsed if it's a string
+  const parsedContent =
+    typeof jsonContent === "string" && jsonContent
+      ? JSON.parse(jsonContent)
+      : jsonContent;
+
   return (
     <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-200 rounded-lg">
       <div className="p-4">
@@ -67,10 +73,12 @@ export default function DropCard({
             {title}
           </h2>
 
-          <Render data={jsonContent} />
+          <div className="text-content">
+            <Render data={parsedContent} />
+          </div>
 
           {image && (
-            <div className="mt-2 mb-2 rounded-md overflow-hidden max-h-[300px] bg-muted/20">
+            <div className="mt-2 mb-2 rounded-md overflow-hidden max-h-[600px] bg-muted/20">
               <Image
                 src={image || "/placeholder.svg"}
                 alt={title}

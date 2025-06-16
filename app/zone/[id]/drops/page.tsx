@@ -107,12 +107,15 @@ export default function CreatePostRoute({
       toast.error("Error", {
         description:
           response.error || "Failed to create point. Please try again.",
+        position: "bottom-right",
       });
       return;
     }
 
     if (response.success && response.pointId) {
-      toast.success("Point created successfully!");
+      toast.success("Point created successfully!", {
+        position: "bottom-right",
+      });
       router.push(`/zone/${resolvedParams.id}`);
     }
   };
@@ -274,7 +277,10 @@ export default function CreatePostRoute({
                             setImageUrl(res[0].url);
                           }}
                           onUploadError={(error: Error) => {
-                            alert(`ERROR! ${error.message}`);
+                            toast.error("Upload Failed", {
+                              description: error.message,
+                              position: "bottom-right",
+                            });
                           }}
                         />
                       )}

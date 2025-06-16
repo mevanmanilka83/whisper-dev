@@ -1,50 +1,58 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import CreateDropCard from "./components/CreateDropCard";
-import { prisma } from "./utils/db";
 import DropCard from "./components/DropCard";
-import { Suspense } from "react";
+import { useEffect, useState } from "react";
 import SkeltonCard from "./components/SkeltonCard";
 import Pagination from "./components/Pagination";
+import { useSearchParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const ITEMS_PER_PAGE = 5;
-
-async function getData(page: number = 1) {
-  const skip = (page - 1) * ITEMS_PER_PAGE;
-
-  const [count, data] = await prisma.$transaction([
-    prisma.point.count(),
-    prisma.point.findMany({
-      take: ITEMS_PER_PAGE,
-      skip: skip,
-      select: {
-        title: true,
-        createdAt: true,
-        id: true,
-        textContent: true,
-        image: true,
-        Boost: true,
-        user: {
-          select: {
-            name: true,
-            image: true,
-          },
-        },
-        subName: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    }),
-  ]);
-  return { count, data };
+interface Post {
+  id: string;
+  title: string;
+  textContent: string;
+  image: string | null;
+  subName: string;
+  createdAt: string;
+  boostCount: number;
 }
 
-async function ShowItems({ page }: { page: number }) {
-  const { count, data } = await getData(page);
+// We'll create a new client-side ShowItems component
+const ClientShowItems = ({ page }: { page: number }) => {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<Post[]>([]);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/zones/posts?page=${page}`);
+        const result = await response.json();
+
+        setData(result.data || []);
+        setCount(result.count || 0);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [page]);
+
+  if (loading) {
+    return <SkeltonCard />;
+  }
+
+  const ITEMS_PER_PAGE = 5;
 
   return (
     <>
@@ -81,12 +89,7 @@ async function ShowItems({ page }: { page: number }) {
                 image={point.image}
                 subName={point.subName}
                 createdAt={point.createdAt}
-                boostCount={Math.max(
-                  0,
-                  point.Boost.reduce((acc, boost) => {
-                    return boost.type === "Boost" ? acc + 1 : acc - 1;
-                  }, 0)
-                )}
+                boostCount={point.boostCount}
               />
             );
           })}
@@ -95,24 +98,71 @@ async function ShowItems({ page }: { page: number }) {
       <Pagination totalPages={Math.ceil(count / ITEMS_PER_PAGE)} />
     </>
   );
-}
+};
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: { page?: string };
-}) {
-  const page = await searchParams.page;
-  const currentPage = Number(page) || 1;
+// Skeleton component for the sidebar
+const SidebarSkeleton = () => {
+  return (
+    <div className="bg-card text-card-foreground flex flex-col gap-6 border py-6 overflow-hidden border-none shadow-sm rounded-lg">
+      <div className="relative">
+        <Skeleton className="w-full h-28 object-cover" />
+        <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent p-3">
+          <div className="flex items-center">
+            <Skeleton className="w-8 h-8 rounded-full border border-white" />
+            <Skeleton className="h-4 w-16 ml-2 bg-white/20" />
+          </div>
+        </div>
+      </div>
+      <div className="p-4">
+        <Separator className="my-3" />
+        <Skeleton className="w-3/4 h-4 mx-auto mb-4" />
+        <div className="flex flex-col gap-y-2">
+          <Skeleton className="w-full h-9 rounded-md" />
+          <Skeleton className="w-full h-9 rounded-md" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function Home() {
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get("page");
+  const currentPage = Number(pageParam) || 1;
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate initial loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="container max-w-5xl mx-auto py-6 px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="md:col-span-2 space-y-4">
+            <Skeleton className="w-full h-[200px] rounded-lg" /> {/* CreateDropCard skeleton */}
+            <SkeltonCard />
+          </div>
+          <div className="md:col-span-1">
+            <div className="sticky top-6">
+              <SidebarSkeleton />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-5xl mx-auto py-6 px-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="md:col-span-2 space-y-4">
           <CreateDropCard />
-          <Suspense fallback={<SkeltonCard />} key={searchParams.page}>
-            <ShowItems page={currentPage} />
-          </Suspense>
+          <ClientShowItems page={currentPage} />
         </div>
 
         <div className="md:col-span-1">
@@ -143,7 +193,6 @@ export default async function Home({
                   </div>
                 </div>
               </div>
-
               <div className="p-4">
                 <Separator className="my-3" />
                 <p className="text-xs text-muted-foreground mb-4 text-center">

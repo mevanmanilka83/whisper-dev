@@ -17,21 +17,21 @@ interface Node {
 export default function Render({ data }: { data: Node | null }) {
   if (!data) {
     return (
-      <div className="text-xs text-muted-foreground line-clamp-2 mb-2">
+      <div className="text-xs text-muted-foreground mb-2">
         No content
       </div>
     );
   }
 
+  const jsonData = typeof data === 'string' ? JSON.parse(data) : data;
+
   const renderNode = (node: Node, index: number): React.ReactNode => {
     if (!node) return null;
 
-    // Handle text nodes
     if (node.text) {
       let content = node.text;
       let element = <span key={index}>{content}</span>;
 
-      // Apply marks (bold, italic, etc.) if present
       if (node.marks && node.marks.length > 0) {
         for (const mark of node.marks) {
           switch (mark.type) {
@@ -62,32 +62,55 @@ export default function Render({ data }: { data: Node | null }) {
       return element;
     }
 
-    // Recursively render child content
     const children =
       node.content?.map((childNode, childIndex) =>
         renderNode(childNode, childIndex)
       ) || [];
 
-    // Render different node types
+    const textAlign = node.attrs?.textAlign;
+    
+    const style: React.CSSProperties = {};
+    if (textAlign) {
+      style.textAlign = textAlign;
+    }
+    
     switch (node.type) {
       case "doc":
         return <div key={index}>{children}</div>;
       case "paragraph":
-        const align = node.attrs?.textAlign || "left";
         return (
-          <p key={index} style={{ textAlign: align }} className="mb-1">
+          <p 
+            key={index} 
+            style={style}
+            className="mb-1"
+          >
             {children}
           </p>
         );
       case "heading":
         const level = node.attrs?.level || 1;
-        const headingAlign = node.attrs?.textAlign || "left";
+        
+        let headingClass = "";
+        switch (level) {
+          case 1:
+            headingClass = "text-2xl font-bold mb-3 mt-4";
+            break;
+          case 2:
+            headingClass = "text-xl font-semibold mb-2 mt-3";
+            break;
+          case 3:
+            headingClass = "text-lg font-medium mb-2 mt-2";
+            break;
+          default:
+            headingClass = "text-base font-medium mb-1 mt-1";
+        }
+        
         const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
         return (
           <HeadingTag
             key={index}
-            style={{ textAlign: headingAlign }}
-            className="font-semibold"
+            style={style}
+            className={headingClass}
           >
             {children}
           </HeadingTag>
@@ -111,10 +134,37 @@ export default function Render({ data }: { data: Node | null }) {
     }
   };
 
-  // In the rendered output, wrap in a container that preserves line clamp
   return (
-    <div className="text-xs text-muted-foreground line-clamp-2 mb-2 prose prose-sm dark:prose-invert max-w-none">
-      {renderNode(data, 0)}
-    </div>
+    <>
+      <style jsx global>{`
+        .text-content p[style*="text-align: center"],
+        .text-content h1[style*="text-align: center"],
+        .text-content h2[style*="text-align: center"],
+        .text-content h3[style*="text-align: center"] {
+          text-align: center !important;
+        }
+        .text-content p[style*="text-align: right"],
+        .text-content h1[style*="text-align: right"],
+        .text-content h2[style*="text-align: right"],
+        .text-content h3[style*="text-align: right"] {
+          text-align: right !important;
+        }
+        .text-content p[style*="text-align: left"],
+        .text-content h1[style*="text-align: left"],
+        .text-content h2[style*="text-align: left"],
+        .text-content h3[style*="text-align: left"] {
+          text-align: left !important;
+        }
+        .text-content p[style*="text-align: justify"],
+        .text-content h1[style*="text-align: justify"],
+        .text-content h2[style*="text-align: justify"],
+        .text-content h3[style*="text-align: justify"] {
+          text-align: justify !important;
+        }
+      `}</style>
+      <div className="prose prose-sm dark:prose-invert max-w-none text-content">
+        {renderNode(jsonData, 0)}
+      </div>
+    </>
   );
 }
