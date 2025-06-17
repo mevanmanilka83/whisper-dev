@@ -1,56 +1,62 @@
-"use client";
+"use client"
 
-import { Card } from "@/components/ui/card";
-import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { ImageIcon, Link2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import Link from "next/link"
+import { ImageIcon, Link2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface CreateDropCardProps {
-  zoneId?: string;
+  zoneId?: string
 }
 
 export default function CreateDropCard({ zoneId }: CreateDropCardProps) {
   return (
-    <Card className="p-3 border-none shadow-sm rounded-lg">
-      <div className="flex items-center gap-2">
-        <div className="relative h-8 w-8 flex-shrink-0">
-          <Image
-            src="/whisper.jpg"
-            alt="User avatar"
-            fill
-            className="object-cover rounded-full"
-          />
-        </div>
+    <Card className="p-4 shadow-sm rounded-lg border-border/50 hover:shadow-md transition-shadow duration-200">
+      <div className="flex items-center space-x-3">
+        {/* Avatar */}
+        <Avatar className="h-9 w-9 flex-shrink-0">
+          <AvatarImage src="/whisper.jpg" alt="User avatar" />
+          <AvatarFallback className="bg-muted text-muted-foreground text-sm">W</AvatarFallback>
+        </Avatar>
+
+        {/* Input */}
         <div className="flex-1">
-          <Link
-            href={zoneId ? `/zone/${zoneId}/drops` : "/communities/VR_46/post"}
-            className="w-full block"
-          >
+          <Link href={zoneId ? `/zone/${zoneId}/drops` : "/communities/VR_46/post"}>
             <Input
-              placeholder="Drop your thoughts..."
-              className="w-full bg-muted/20 hover:bg-muted/30 transition-colors rounded-md border-none focus-visible:ring-0 h-9 text-sm"
+              placeholder="What's happening?"
+              className="w-full bg-muted/50 hover:bg-muted/70 transition-colors border-0 focus-visible:ring-1 focus-visible:ring-primary h-10 text-sm rounded-full px-4"
+              readOnly
             />
           </Link>
         </div>
-        <div className="flex gap-1">
+
+        {/* Action Buttons */}
+        <div className="flex items-center space-x-1">
           <Button
             variant="ghost"
-            size="icon"
-            className="rounded-md hover:bg-muted/20 h-8 w-8 text-muted-foreground"
+            size="sm"
+            className="h-9 w-9 p-0 hover:bg-muted/70 text-muted-foreground hover:text-foreground rounded-full"
+            asChild
           >
-            <ImageIcon className="w-4 h-4" />
+            <Link href={zoneId ? `/zone/${zoneId}/drops` : "/communities/VR_46/post"}>
+              <ImageIcon className="h-4 w-4" />
+            </Link>
           </Button>
+
           <Button
             variant="ghost"
-            size="icon"
-            className="rounded-md bg-primary/10 text-primary hover:bg-primary/20 h-8 w-8"
+            size="sm"
+            className="h-9 w-9 p-0 hover:bg-primary/10 text-primary hover:text-primary rounded-full"
+            asChild
           >
-            <Link2 className="w-4 h-4" />
+            <Link href={zoneId ? `/zone/${zoneId}/drops` : "/communities/VR_46/post"}>
+              <Link2 className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </div>
     </Card>
-  );
+  )
 }

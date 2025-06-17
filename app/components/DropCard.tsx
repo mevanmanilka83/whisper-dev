@@ -1,139 +1,148 @@
-"use client";
+"use client"
 
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Rocket, Anchor, MessageSquare } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
-import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Rocket, Anchor, MessageSquare, Clock, User } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { formatDistanceToNow } from "date-fns"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Separator } from "@/components/ui/separator"
 
-import CopyLink from "./CopyLink";
-import { handleBoost } from "../actions/actions";
-import Render from "./Render";
+import CopyLink from "./CopyLink"
+import { handleBoost } from "../actions/actions"
+import Render from "./Render"
 
 interface DropCardProps {
-  title: string;
-  jsonContent: any;
-  createdAt: any;
-  id: string;
-  image: string | null;
-  subName: string | null;
-  boostCount: number;
+  title: string
+  jsonContent: any
+  createdAt: any
+  id: string
+  image: string | null
+  subName: string | null
+  boostCount: number
 }
 
-export default function DropCard({
-  id,
-  title,
-  jsonContent,
-  createdAt,
-  image,
-  subName,
-  boostCount,
-}: DropCardProps) {
-  const formattedDate = createdAt
-    ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
-    : "";
+export default function DropCard({ id, title, jsonContent, createdAt, image, subName, boostCount }: DropCardProps) {
+  const formattedDate = createdAt ? formatDistanceToNow(new Date(createdAt), { addSuffix: true }) : ""
 
   // Ensure jsonContent is properly parsed if it's a string
-  const parsedContent =
-    typeof jsonContent === "string" && jsonContent
-      ? JSON.parse(jsonContent)
-      : jsonContent;
+  const parsedContent = typeof jsonContent === "string" && jsonContent ? JSON.parse(jsonContent) : jsonContent
 
   return (
-    <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-200 rounded-lg">
-      <div className="p-4">
-        <div className="flex items-center text-xs text-muted-foreground mb-2">
+    <Card className="overflow-hidden border shadow-sm hover:shadow-lg transition-all duration-300 rounded-xl bg-background/80 backdrop-blur-sm group">
+      <div className="p-6">
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-8 w-8 ring-2 ring-border/20">
+              <AvatarImage src="/whisper.jpg" alt="User avatar" />
+              <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium hover:text-primary cursor-pointer transition-colors">VR_46</span>
+              <div className="flex items-center text-xs text-muted-foreground">
+                <Clock className="h-3 w-3 mr-1" />
+                {formattedDate}
+              </div>
+            </div>
+          </div>
           {subName && (
             <Badge
-              variant="outline"
-              className="mr-2 bg-primary/5 hover:bg-primary/5 text-primary border-primary/20 px-2 py-0 h-5"
+              variant="secondary"
+              className="bg-primary/10 hover:bg-primary/15 text-primary border-primary/20 px-3 py-1 text-xs font-medium"
             >
               zone/{subName}
             </Badge>
           )}
-          <span className="inline-flex items-center">
-            <span className="relative h-4 w-4 mr-1">
-              <Image
-                src="/whisper.jpg"
-                alt="User avatar"
-                fill
-                className="rounded-full object-cover"
-              />
-            </span>
-            <span className="hover:text-foreground cursor-pointer">VR_46</span>
-          </span>
-          <span className="mx-1.5">•</span>
-          <span>{formattedDate}</span>
         </div>
 
-        <Link href={`/drop/${id}`} className="block group">
-          <h2 className="text-base font-medium group-hover:text-primary transition-colors mb-2">
-            {title}
-          </h2>
+        {/* Content Section */}
+        <Link href={`/drop/${id}`} className="block group/content">
+          <div className="space-y-3">
+            <h2 className="text-lg font-semibold leading-tight group-hover/content:text-primary transition-colors duration-200">
+              {title}
+            </h2>
 
-          <div className="text-content">
-            <Render data={parsedContent} />
-          </div>
-
-          {image && (
-            <div className="mt-2 mb-2 rounded-md overflow-hidden max-h-[600px] bg-muted/20">
-              <Image
-                src={image || "/placeholder.svg"}
-                alt={title}
-                width={600}
-                height={400}
-                className="w-full object-cover"
-              />
+            <div className="text-content prose prose-sm dark:prose-invert max-w-none">
+              <Render data={parsedContent} />
             </div>
-          )}
+
+            {image && (
+              <div className="mt-4 rounded-lg overflow-hidden bg-muted/20 shadow-sm">
+                <Image
+                  src={image || "/placeholder.svg"}
+                  alt={title}
+                  width={600}
+                  height={400}
+                  className="w-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            )}
+          </div>
         </Link>
 
-        <div className="flex items-center mt-3 gap-2">
-          <div className="flex items-center">
-            <form action={handleBoost}>
-              <input type="hidden" name="boostDirection" value="Boost" />
-              <input type="hidden" name="pointId" value={id} />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-md hover:bg-primary/5 hover:text-primary transition-colors h-7 w-7 p-0"
-                title="Boost"
-                type="submit"
-              >
-                <Rocket className="w-4 h-4" />
-              </Button>
-            </form>
-            <span>{boostCount}</span>
-            <form action={handleBoost}>
-              <input type="hidden" name="boostDirection" value="Reduce" />
-              <input type="hidden" name="pointId" value={id} />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-md hover:bg-destructive/5 hover:text-destructive transition-colors h-7 w-7 p-0"
-                title="Reduce"
-                type="submit"
-              >
-                <Anchor className="w-4 h-4" />{" "}
-              </Button>
-            </form>
-          </div>
-          <div className="h-4 w-px bg-muted/50 mx-1"></div>
-          <div className="flex items-center gap-x-5">
+        <Separator className="my-4" />
+
+        {/* Action Bar */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-1">
+            {/* Boost Actions */}
+            <div className="flex items-center bg-muted/30 rounded-lg p-1">
+              <form action={handleBoost} className="inline">
+                <input type="hidden" name="boostDirection" value="Boost" />
+                <input type="hidden" name="pointId" value={id} />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-110"
+                  title="Boost this drop"
+                  type="submit"
+                >
+                  <Rocket className="w-4 h-4" />
+                </Button>
+              </form>
+
+              <span className="px-2 text-sm font-medium min-w-[2rem] text-center">{boostCount}</span>
+
+              <form action={handleBoost} className="inline">
+                <input type="hidden" name="boostDirection" value="Reduce" />
+                <input type="hidden" name="pointId" value={id} />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive transition-all duration-200 hover:scale-110"
+                  title="Reduce this drop"
+                  type="submit"
+                >
+                  <Anchor className="w-4 h-4" />
+                </Button>
+              </form>
+            </div>
+
+            <Separator orientation="vertical" className="h-6 mx-2" />
+
+            {/* Comments */}
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors px-2 ml-auto"
+              className="h-8 px-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 rounded-lg"
+              asChild
             >
-              <MessageSquare className="w-3.5 h-3.5 mr-1" />
-              <span className="text-xs">40 comments</span>
+              <Link href={`/drop/${id}#comments`}>
+                <MessageSquare className="w-4 h-4 mr-2" />
+                <span className="text-sm">40 comments</span>
+              </Link>
             </Button>
           </div>
+
+          {/* Copy Link */}
           <CopyLink id={id} />
         </div>
       </div>
     </Card>
-  );
+  )
 }
