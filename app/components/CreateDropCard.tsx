@@ -6,6 +6,8 @@ import Link from "next/link"
 import { ImageIcon, Link2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Suspense } from "react"
+import SkeltonCard from "@/app/components/SkeltonCard"
 
 interface CreateDropCardProps {
   zoneId?: string

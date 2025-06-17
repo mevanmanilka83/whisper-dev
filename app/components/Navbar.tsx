@@ -40,18 +40,18 @@ export default function Navbar() {
               />
             ) : (
               <Link href="/sign-in">
-                <Button
+        <Button
                   variant="default"
                   size="sm"
                   className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
                 >
                   <span className="relative z-10">Sign In</span>
-                </Button>
+        </Button>
               </Link>
             )}
           </nav>
         </div>
-      </div>
+          </div>
     </nav>
   )
 }

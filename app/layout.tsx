@@ -6,6 +6,7 @@ import "./globals.css"
 import Navbar from "./components/Navbar"
 import { ThemeProvider } from "./components/theme-provider"
 import { AuthProvider } from "./components/auth-provider"
+import { Github } from "lucide-react"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,8 +51,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                         Terms
                       </a>
-                      <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                        Contact
+                      <a
+                        href="https://github.com/mevanmanilka83"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label="GitHub Repository"
+                      >
+                        <Github className="w-5 h-5" />
                       </a>
                     </div>
                   </div>

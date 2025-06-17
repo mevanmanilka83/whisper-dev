@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { Loader2 } from "lucide-react"
+import SkeltonCard from "@/app/components/SkeltonCard"
 
 import SubmitButton from "@/app/components/SubmitButton"
 import EditorComponent from "@/app/components/Editor"
@@ -70,14 +70,7 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
   if (status === "loading") {
     return (
       <div className="container max-w-6xl mx-auto py-12 px-4">
-        <Card className="border shadow-lg">
-          <CardContent className="flex items-center justify-center py-12">
-            <div className="flex items-center space-x-2">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              <span className="text-muted-foreground">Loading...</span>
-            </div>
-          </CardContent>
-        </Card>
+        <SkeltonCard />
       </div>
     )
   }
@@ -208,7 +201,7 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
                       <Label htmlFor="content" className="text-base font-medium">
                         Content
                       </Label>
-                      <div className="border rounded-lg">
+                      <div className="rounded-lg">
                         <EditorComponent setJson={setJson} json={json} />
                       </div>
                     </div>

@@ -1,8 +1,13 @@
+"use client";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { SVGProps } from "react"
 import SubmitButton from "./SubmitButton"
-import { auth, signIn } from "@/app/utils/auth"
-import { redirect } from "next/navigation"
+import { signIn } from "next-auth/react"
+import { useSession } from "next-auth/react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import SignInSkeleton from "./SignInSkeleton"
 
 const Github = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -48,11 +53,25 @@ const Google = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 )
 
-export async function SignIn() {
-  const session = await auth()
-  if (session?.user) {
-    return redirect("/")
+export function SignIn() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    if (status === "loading") {
+      setIsLoading(true)
+    } else if (status === "authenticated" && session?.user) {
+      router.push("/")
+    } else {
+      setIsLoading(false)
+    }
+  }, [status, session, router])
+
+  if (isLoading) {
+    return <SignInSkeleton />
   }
+
   return (
     <div className="container max-w-md mx-auto py-12 px-4">
       <Card className="border shadow-lg">
@@ -62,10 +81,10 @@ export async function SignIn() {
         </CardHeader>
         <CardContent className="space-y-4">
           <form
-            action={async () => {
-              "use server"
+            onSubmit={async (e) => {
+              e.preventDefault()
               await signIn("github", {
-                redirectTo: "/",
+                callbackUrl: "/",
               })
             }}
           >
@@ -82,10 +101,10 @@ export async function SignIn() {
           </div>
 
           <form
-            action={async () => {
-              "use server"
+            onSubmit={async (e) => {
+              e.preventDefault()
               await signIn("google", {
-                redirectTo: "/",
+                callbackUrl: "/",
               })
             }}
           >

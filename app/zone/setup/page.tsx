@@ -13,7 +13,8 @@ import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Plus, ArrowLeft } from "lucide-react"
+import { Plus, ArrowLeft } from "lucide-react"
+import ZoneSetupSkeleton from "@/app/components/ZoneSetupSkeleton"
 
 type ActionState = {
   message: string
@@ -56,18 +57,7 @@ export default function Page() {
   }, [state, router])
 
   if (status === "loading") {
-    return (
-      <div className="container max-w-2xl mx-auto py-12 px-4">
-        <Card className="border shadow-lg">
-          <CardContent className="flex items-center justify-center py-12">
-            <div className="flex items-center space-x-2">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              <span className="text-muted-foreground">Loading...</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
+    return <ZoneSetupSkeleton />
   }
 
   return (

@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator"
 import CopyLink from "./CopyLink"
 import { handleBoost } from "../actions/actions"
 import Render from "./Render"
+import SkeltonCard from "./SkeltonCard"
 
 interface DropCardProps {
   title: string
@@ -25,6 +26,11 @@ interface DropCardProps {
 }
 
 export default function DropCard({ id, title, jsonContent, createdAt, image, subName, boostCount }: DropCardProps) {
+  // Show skeleton if required data is missing
+  if (!title || !jsonContent) {
+    return <SkeltonCard />
+  }
+
   const formattedDate = createdAt ? formatDistanceToNow(new Date(createdAt), { addSuffix: true }) : ""
 
   // Ensure jsonContent is properly parsed if it's a string
