@@ -119,9 +119,19 @@
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
+    /* Prevent layout shift from scrollbar */
+    scrollbar-gutter: stable;
+    /* Ensure consistent width */
+    width: 100vw;
+    max-width: 100vw;
   }
   html {
     overflow-x: hidden;
+    /* Prevent layout shift from scrollbar */
+    scrollbar-gutter: stable;
+    /* Ensure consistent width */
+    width: 100vw;
+    max-width: 100vw;
   }
   .prose {
     max-width: none;
@@ -131,5 +141,53 @@
   .prose * {
     overflow-wrap: break-word;
     word-wrap: break-word;
+  }
+  
+  /* Prevent layout shifts from dropdowns */
+  [data-radix-popper-content-wrapper] {
+    position: fixed !important;
+    z-index: 9999;
+  }
+  
+  /* Ensure dropdown content doesn't affect layout */
+  [data-radix-dropdown-menu-content] {
+    position: absolute !important;
+    z-index: 9999;
+  }
+  
+  /* Prevent scrollbar from causing layout shifts */
+  :root {
+    scrollbar-gutter: stable;
+  }
+  
+  /* Ensure body maintains consistent width */
+  body {
+    width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  /* Prevent any layout shifts from Radix components */
+  [data-radix-portal] {
+    position: fixed;
+    z-index: 9999;
+  }
+  
+  /* Prevent layout shifts from any portal content */
+  [data-radix-portal] > * {
+    position: fixed !important;
+    z-index: 9999;
+  }
+  
+  /* Ensure main content doesn't shift */
+  main {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* Prevent container shifts */
+  .container {
+    width: 100%;
+    max-width: 100%;
   }
 }

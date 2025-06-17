@@ -30,14 +30,16 @@ export default function Navbar() {
 
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">{/* You can add a search bar here if needed */}</div>
-          <nav className="flex items-center space-x-1">
+          <nav className="flex items-center space-x-1 flex-shrink-0">
             <ThemeToggle />
             {session?.user ? (
-              <UserDropdown
-                userImage={session.user.image || ""}
-                userName={session.user.name || ""}
-                userEmail={session.user.email || ""}
-              />
+              <div className="flex-shrink-0 w-10 h-10">
+                <UserDropdown
+                  userImage={session.user.image || ""}
+                  userName={session.user.name || ""}
+                  userEmail={session.user.email || ""}
+                />
+              </div>
             ) : (
               <Link href="/sign-in">
         <Button
