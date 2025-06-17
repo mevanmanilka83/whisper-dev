@@ -17,8 +17,8 @@ import SkeltonCard from "./SkeltonCard"
 
 interface DropCardProps {
   title: string
-  jsonContent: any
-  createdAt: any
+  jsonContent: unknown
+  createdAt: string | Date
   id: string
   image: string | null
   subName: string | null
@@ -73,7 +73,7 @@ export default function DropCard({ id, title, jsonContent, createdAt, image, sub
               {title}
             </h2>
 
-            <div className="text-content prose prose-sm dark:prose-invert max-w-none">
+            <div className="text-content prose prose-sm dark:prose-invert w-full overflow-hidden break-words">
               <Render data={parsedContent} />
             </div>
 

@@ -118,5 +118,18 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+  }
+  html {
+    overflow-x: hidden;
+  }
+  .prose {
+    max-width: none;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+  .prose * {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
 }

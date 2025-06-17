@@ -102,7 +102,7 @@ export default function PointViewer({ point }: PointViewerProps) {
         )}
 
         {editor ? (
-          <div className="prose prose-sm dark:prose-invert max-w-none">
+          <div className="prose prose-sm dark:prose-invert w-full overflow-hidden break-words">
             <EditorContent editor={editor} />
           </div>
         ) : (

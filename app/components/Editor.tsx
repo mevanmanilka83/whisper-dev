@@ -250,7 +250,7 @@ const EditorComponent = ({
     editorProps: {
       attributes: {
         class:
-          "min-h-[250px] rounded-lg border-0 bg-transparent px-4 py-4 focus-visible:outline-none prose prose-sm dark:prose-invert max-w-none",
+          "min-h-[250px] rounded-lg border-0 bg-transparent px-4 py-4 focus-visible:outline-none prose prose-sm dark:prose-invert w-full overflow-hidden break-words",
       },
     },
     onUpdate: ({ editor }) => {
@@ -270,7 +270,7 @@ const EditorComponent = ({
       <div className="shadow-sm overflow-hidden rounded-lg">
         <EditorContent
           editor={editor}
-          className="prose prose-sm dark:prose-invert max-w-none focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-200"
+          className="prose prose-sm dark:prose-invert w-full overflow-hidden break-words focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-200"
         />
       </div>
 

@@ -6,12 +6,12 @@ interface Node {
   type: string;
   content?: Node[];
   text?: string;
-  attrs?: Record<string, any>;
+  attrs?: Record<string, unknown>;
   marks?: Array<{
     type: string;
-    attrs?: Record<string, any>;
+    attrs?: Record<string, unknown>;
   }>;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export default function Render({ data }: { data: Node | null }) {
@@ -29,7 +29,7 @@ export default function Render({ data }: { data: Node | null }) {
     if (!node) return null;
 
     if (node.text) {
-      let content = node.text;
+      const content = node.text;
       let element = <span key={index}>{content}</span>;
 
       if (node.marks && node.marks.length > 0) {
@@ -67,7 +67,7 @@ export default function Render({ data }: { data: Node | null }) {
         renderNode(childNode, childIndex)
       ) || [];
 
-    const textAlign = node.attrs?.textAlign;
+    const textAlign = node.attrs?.textAlign as 'left' | 'center' | 'right' | 'justify' | undefined;
     
     const style: React.CSSProperties = {};
     if (textAlign) {
@@ -88,7 +88,7 @@ export default function Render({ data }: { data: Node | null }) {
           </p>
         );
       case "heading":
-        const level = node.attrs?.level || 1;
+        const level = (node.attrs?.level as number) || 1;
         
         let headingClass = "";
         switch (level) {
@@ -105,15 +105,15 @@ export default function Render({ data }: { data: Node | null }) {
             headingClass = "text-base font-medium mb-1 mt-1";
         }
         
-        const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
-        return (
-          <HeadingTag
-            key={index}
-            style={style}
-            className={headingClass}
-          >
-            {children}
-          </HeadingTag>
+        const HeadingTag = `h${level}` as keyof React.JSX.IntrinsicElements;
+        return React.createElement(
+          HeadingTag,
+          {
+            key: index,
+            style,
+            className: headingClass,
+          },
+          children
         );
       case "bulletList":
         return (
@@ -162,7 +162,7 @@ export default function Render({ data }: { data: Node | null }) {
           text-align: justify !important;
         }
       `}</style>
-      <div className="prose prose-sm dark:prose-invert max-w-none text-content">
+      <div className="prose prose-sm dark:prose-invert w-full overflow-hidden break-words text-content">
         {renderNode(jsonData, 0)}
       </div>
     </>
