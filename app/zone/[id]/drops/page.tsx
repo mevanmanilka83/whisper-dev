@@ -298,7 +298,7 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
                     <Shield className="h-5 w-5 text-primary" />
                   </AvatarFallback>
                 </Avatar>
-                <CardTitle className="text-lg">Community Guidelines</CardTitle>
+                <CardTitle className="text-lg"> Guidelines</CardTitle>
               </div>
               <Separator />
             </CardHeader>

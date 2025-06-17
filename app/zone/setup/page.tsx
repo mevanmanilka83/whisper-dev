@@ -81,7 +81,7 @@ export default function Page() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
             Setup your Zone
           </h1>
-          <p className="text-muted-foreground text-lg">Create a new space for your community</p>
+          <p className="text-muted-foreground text-lg">Create a new space for you</p>
         </div>
 
         {/* Form Card */}
