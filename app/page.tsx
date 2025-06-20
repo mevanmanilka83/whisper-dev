@@ -12,7 +12,7 @@ import SkeltonCard from "./components/SkeltonCard"
 import Pagination from "./components/Pagination"
 import { useSearchParams } from "next/navigation"
 import { Skeleton } from "@/components/ui/skeleton"
-import { PlusCircle, MessageSquare } from "lucide-react"
+import { PlusCircle, MessageSquare, Clock } from "lucide-react"
 
 interface Post {
   id: string
@@ -144,13 +144,13 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-5xl mx-auto py-6 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-5">
+      <div className="container max-w-6xl mx-auto py-8 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-5">
             <Skeleton className="w-full h-[200px] rounded-xl" /> {/* CreateDropCard skeleton */}
             <SkeltonCard />
           </div>
-          <div className="md:col-span-1">
+          <div className="lg:col-span-1">
             <div className="sticky top-20">
               <SidebarSkeleton />
             </div>
@@ -161,28 +161,28 @@ export default function Home() {
   }
 
   return (
-    <div className="container max-w-5xl mx-auto py-6 px-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-5">
+    <div className="container max-w-6xl mx-auto py-8 px-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-5">
           <CreateDropCard />
           <ClientShowItems page={currentPage} />
         </div>
 
-        <div className="md:col-span-1">
-          <div className="sticky top-20">
-            <Card className="overflow-hidden border-none shadow-md rounded-xl">
+        <div className="lg:col-span-1">
+          <div className="sticky top-32">
+            <Card className="bg-card text-card-foreground flex flex-col gap-1 border py-0 overflow-hidden border-none shadow-lg rounded-xl">
               <div className="relative">
                 <Image
                   src="/banner.jpg"
                   alt="Banner"
-                  className="w-full h-32 object-cover"
+                  className="w-full h-36 object-cover"
                   width={400}
-                  height={128}
+                  height={144}
                   priority
                 />
 
                 <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-4">
-                  <div className="flex items-center">
+                  <div className="flex items-center space-x-3">
                     <Image
                       src="/whisper.jpg"
                       alt="Whisper logo"
@@ -190,21 +190,29 @@ export default function Home() {
                       width={40}
                       height={40}
                     />
-                    <h1 className="font-semibold pl-3 text-white text-base">Home</h1>
+                    <div>
+                      <h1 className="font-semibold text-white text-lg">Home</h1>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="p-5">
-                <Separator className="my-4" />
-                <p className="text-sm text-muted-foreground mb-5 text-center">
-                  Whisper is a secure platform for sharing thoughts and engaging in discussions.
-                </p>
-
+              <div className="p-6">
+                <div className="flex items-center space-x-2 mb-5">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    Whisper Platform
+                  </p>
+                </div>
+                <div className="mb-5">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Whisper is a secure platform for sharing thoughts and engaging in discussions.
+                  </p>
+                </div>
                 <div className="flex flex-col gap-y-3">
                   <Button
                     asChild
                     variant="outline"
-                    className="w-full rounded-lg border-muted hover:bg-muted/10 transition-colors h-10 text-sm font-medium"
+                    className="w-full rounded-lg border-muted hover:bg-muted/10 transition-colors h-11 text-sm font-medium"
                   >
                     <Link href="/communities/create">
                       <PlusCircle className="mr-2 h-4 w-4" />
@@ -214,7 +222,7 @@ export default function Home() {
 
                   <Button
                     asChild
-                    className="w-full rounded-lg bg-primary hover:bg-primary/90 transition-colors h-10 text-sm font-medium shadow-sm"
+                    className="w-full rounded-lg bg-primary hover:bg-primary/90 transition-colors h-11 text-sm font-medium shadow-sm"
                   >
                     <Link href="/communities/VR_46/post">
                       <MessageSquare className="mr-2 h-4 w-4" />
