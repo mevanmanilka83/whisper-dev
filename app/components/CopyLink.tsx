@@ -4,7 +4,7 @@ import { Share } from "lucide-react";
 import { toast } from "sonner";
 export default function CopyLink({ id }: { id: string }) {
   async function copyToClipboard() {
-    await navigator.clipboard.writeText(`${window.location.origin}/drop/${id}`);
+    await navigator.clipboard.writeText(`${window.location.origin}/post/${id}`);
     toast.success("Link copied to clipboard!", {
       description: "You can now share this link with others.",
     });

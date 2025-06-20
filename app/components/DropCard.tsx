@@ -67,7 +67,7 @@ export default function DropCard({ id, title, jsonContent, createdAt, image, sub
         </div>
 
         {/* Content Section */}
-        <Link href={`/drop/${id}`} className="block group/content">
+        <Link href={`/post/${id}`} className="block group/content">
           <div className="space-y-3">
             <h2 className="text-lg font-semibold leading-tight group-hover/content:text-primary transition-colors duration-200">
               {title}
@@ -138,7 +138,7 @@ export default function DropCard({ id, title, jsonContent, createdAt, image, sub
               className="h-8 px-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 rounded-lg"
               asChild
             >
-              <Link href={`/drop/${id}#comments`}>
+              <Link href={`/post/${id}#comments`}>
                 <MessageSquare className="w-4 h-4 mr-2" />
                 <span className="text-sm">40 comments</span>
               </Link>
