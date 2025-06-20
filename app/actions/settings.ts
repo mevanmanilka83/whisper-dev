@@ -3,6 +3,7 @@
 import { prisma } from "@/app/utils/db"
 import { auth } from "@/app/utils/auth"
 import { revalidatePath } from "next/cache"
+import { Prisma } from "@prisma/client"
 
 export async function updateSettings(formData: FormData) {
   try {
@@ -45,6 +46,90 @@ export async function updateSettings(formData: FormData) {
     console.error("Error updating settings:", error)
     return { error: "Failed to update settings" }
   }
+}
+
+export async function acceptInvitation({ invitationId }: { invitationId: string }) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return { error: "Not authenticated" }
+  }
+
+  try {
+    const invitation = await prisma.zoneInvitation.findUnique({
+      where: { id: invitationId },
+    })
+
+    if (!invitation || invitation.inviteeId !== session.user.id) {
+      return { error: "Invitation not found or you are not the invitee." }
+    }
+    
+    if (invitation.status !== "PENDING") {
+      return { error: "Invitation is not pending." }
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.zoneInvitation.update({
+        where: { id: invitationId },
+        data: { status: "ACCEPTED" },
+      })
+
+      await tx.zoneMember.create({
+        data: {
+          userId: invitation.type === 'INVITATION' ? invitation.inviteeId : invitation.inviterId,
+          zoneId: invitation.zoneId,
+          role: "COLLABORATOR",
+        },
+      })
+    })
+
+    revalidatePath("/settings")
+    if (invitation.zoneId) {
+        revalidatePath(`/zone/${invitation.zoneId}`)
+    }
+    return { success: true }
+  } catch (error: unknown) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        await prisma.zoneInvitation.update({
+            where: { id: invitationId },
+            data: { status: "DECLINED" },
+        });
+        return { error: "User is already a member of this zone. The invitation has been declined." }
+    }
+    console.error("Error accepting invitation:", error)
+    return { error: "An unexpected error occurred." }
+  }
+}
+
+export async function declineInvitation({ invitationId }: { invitationId: string }) {
+    const session = await auth()
+    if (!session?.user?.id) {
+        return { error: "Not authenticated" }
+    }
+
+    try {
+        const invitation = await prisma.zoneInvitation.findUnique({
+            where: { id: invitationId },
+        })
+
+        if (!invitation || invitation.inviteeId !== session.user.id) {
+            return { error: "Invitation not found or you are not the invitee." }
+        }
+
+        if (invitation.status !== "PENDING") {
+          return { error: "Invitation is not pending." }
+        }
+
+        await prisma.zoneInvitation.update({
+            where: { id: invitationId },
+            data: { status: "DECLINED" },
+        })
+
+        revalidatePath("/settings")
+        return { success: true }
+    } catch (error) {
+        console.error("Error declining invitation:", error)
+        return { error: "An unexpected error occurred." }
+    }
 }
 
 export async function deleteAccount() {

@@ -6,7 +6,6 @@ import CreateDropCard from "./components/CreateDropCard"
 import { Suspense } from "react"
 import SkeltonCard from "./components/SkeltonCard"
 import { PlusCircle, MessageSquare, Clock } from "lucide-react"
-import { auth } from "@/app/utils/auth"
 import ClientShowItems from "./components/ClientShowItems"
 
 export default async function Home({
@@ -14,7 +13,6 @@ export default async function Home({
 }: {
   searchParams: Promise<{ page?: string }>
 }) {
-  const session = await auth()
   const params = await searchParams
   const currentPage = Number(params.page) || 1
 
@@ -22,8 +20,8 @@ export default async function Home({
     <div className="container max-w-6xl mx-auto py-8 px-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          {/* Only show CreateDropCard for authenticated users */}
-          {session?.user?.id && <CreateDropCard />}
+          {/* Always show CreateDropCard, even if not signed in */}
+          <CreateDropCard />
 
           <Suspense fallback={<SkeltonCard />}>
             <ClientShowItems page={currentPage} />

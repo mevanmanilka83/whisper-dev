@@ -372,7 +372,7 @@ export async function handleBoost(formData: FormData) {
   }
 }
 
-export async function joinZone(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
+export async function sendCollaborationInvite(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -381,6 +381,94 @@ export async function joinZone(formData: FormData): Promise<{ error?: string; su
 
   try {
     const zoneName = formData.get("zoneName")?.toString().trim();
+    const inviteeEmail = formData.get("inviteeEmail")?.toString().trim();
+    const message = formData.get("message")?.toString().trim();
+
+    if (!zoneName || !inviteeEmail) {
+      throw new Error("Zone name and invitee email are required.");
+    }
+
+    // Find the zone
+    const zone = await prisma.zone.findUnique({
+      where: { name: zoneName },
+    });
+
+    if (!zone) {
+      throw new Error(`Zone with name ${zoneName} not found.`);
+    }
+
+    // Check if user is the zone owner
+    if (zone.userId !== session.user.id) {
+      throw new Error("Only zone owners can send collaboration invites.");
+    }
+
+    // Find the invitee by email
+    const invitee = await prisma.user.findUnique({
+      where: { email: inviteeEmail },
+    });
+
+    if (!invitee) {
+      throw new Error(`User with email ${inviteeEmail} not found.`);
+    }
+
+    // Check if invitee is already a member
+    const existingMembership = await prisma.zoneMember.findUnique({
+      where: {
+        userId_zoneId: {
+          userId: invitee.id,
+          zoneId: zone.id,
+        },
+      },
+    });
+
+    if (existingMembership) {
+      throw new Error("User is already a member of this zone.");
+    }
+
+    // Check if there's already a pending invitation
+    const existingInvitation = await prisma.zoneInvitation.findUnique({
+      where: {
+        zoneId_inviteeId: {
+          zoneId: zone.id,
+          inviteeId: invitee.id,
+        },
+      },
+    });
+
+    if (existingInvitation && existingInvitation.status === "PENDING") {
+      throw new Error("An invitation is already pending for this user.");
+    }
+
+    // Create invitation
+    await prisma.zoneInvitation.create({
+      data: {
+        zoneId: zone.id,
+        inviterId: session.user.id,
+        inviteeId: invitee.id,
+        message: message || null,
+      },
+    });
+
+    return {
+      success: true,
+      message: `Collaboration invite sent to ${inviteeEmail}!`,
+    };
+  } catch (e) {
+    console.error("Error sending collaboration invite:", e);
+    return { error: e instanceof Error ? e.message : "Failed to send collaboration invite" };
+  }
+}
+
+export async function requestToJoinZone(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return redirect("/api/auth/signin");
+  }
+
+  try {
+    const zoneName = formData.get("zoneName")?.toString().trim();
+    const message = formData.get("message")?.toString().trim();
 
     if (!zoneName) {
       throw new Error("Zone name is required.");
@@ -405,27 +493,164 @@ export async function joinZone(formData: FormData): Promise<{ error?: string; su
     });
 
     if (existingMembership) {
-      return { error: "You are already a member of this zone." };
+      throw new Error("You are already a member of this zone.");
     }
 
-    // Create membership
-    await prisma.zoneMember.create({
+    // Check if there's already a pending invitation
+    const existingInvitation = await prisma.zoneInvitation.findUnique({
+      where: {
+        zoneId_inviteeId: {
+          zoneId: zone.id,
+          inviteeId: session.user.id,
+        },
+      },
+    });
+
+    if (existingInvitation && existingInvitation.status === "PENDING") {
+      throw new Error("You already have a pending request for this zone.");
+    }
+
+    // Create a join request. The user is both the inviter and invitee,
+    // which signifies a request about themselves for the zone owner to review.
+    await prisma.zoneInvitation.create({
       data: {
-        userId: session.user.id,
         zoneId: zone.id,
+        inviterId: session.user.id,
+        inviteeId: session.user.id,
+        message: message || null,
       },
     });
 
     return {
       success: true,
-      message: `Successfully joined ${zoneName}!`,
+      message: `Join request sent to zone owner!`,
     };
   } catch (e) {
-    console.error("Error joining zone:", e);
-    return { error: e instanceof Error ? e.message : "Failed to join zone" };
+    console.error("Error requesting to join zone:", e);
+    return { error: e instanceof Error ? e.message : "Failed to request to join zone" };
   }
 }
 
+export async function acceptInvitation(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return redirect("/api/auth/signin");
+  }
+
+  try {
+    const invitationId = formData.get("invitationId")?.toString().trim();
+
+    if (!invitationId) {
+      throw new Error("Invitation ID is required.");
+    }
+
+    const invitation = await prisma.zoneInvitation.findUnique({
+      where: { id: invitationId },
+      include: {
+        zone: true,
+        inviter: true,
+        invitee: true,
+      },
+    });
+
+    if (!invitation) {
+      throw new Error("Invitation not found.");
+    }
+
+    // Check if user is the invitee or zone owner
+    const isInvitee = invitation.inviteeId === session.user.id;
+    const isZoneOwner = invitation.zone.userId === session.user.id;
+
+    if (!isInvitee && !isZoneOwner) {
+      throw new Error("You are not authorized to accept this invitation.");
+    }
+
+    if (invitation.status !== "PENDING") {
+      throw new Error("This invitation is no longer pending.");
+    }
+
+    // Update invitation status
+    await prisma.zoneInvitation.update({
+      where: { id: invitationId },
+      data: { status: "ACCEPTED" },
+    });
+
+    // Create membership
+    await prisma.zoneMember.create({
+      data: {
+        userId: invitation.inviteeId,
+        zoneId: invitation.zoneId,
+        role: "COLLABORATOR",
+      },
+    });
+
+    return {
+      success: true,
+      message: "Invitation accepted! You are now a collaborator.",
+    };
+  } catch (e) {
+    console.error("Error accepting invitation:", e);
+    return { error: e instanceof Error ? e.message : "Failed to accept invitation" };
+  }
+}
+
+export async function declineInvitation(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return redirect("/api/auth/signin");
+  }
+
+  try {
+    const invitationId = formData.get("invitationId")?.toString().trim();
+
+    if (!invitationId) {
+      throw new Error("Invitation ID is required.");
+    }
+
+    const invitation = await prisma.zoneInvitation.findUnique({
+      where: { id: invitationId },
+    });
+
+    if (!invitation) {
+      throw new Error("Invitation not found.");
+    }
+
+    // Check if user is the invitee or zone owner
+    const isInvitee = invitation.inviteeId === session.user.id;
+    const isZoneOwner = invitation.zoneId === session.user.id;
+
+    if (!isInvitee && !isZoneOwner) {
+      throw new Error("You are not authorized to decline this invitation.");
+    }
+
+    if (invitation.status !== "PENDING") {
+      throw new Error("This invitation is no longer pending.");
+    }
+
+    // Update invitation status
+    await prisma.zoneInvitation.update({
+      where: { id: invitationId },
+      data: { status: "DECLINED" },
+    });
+
+    return {
+      success: true,
+      message: "Invitation declined.",
+    };
+  } catch (e) {
+    console.error("Error declining invitation:", e);
+    return { error: e instanceof Error ? e.message : "Failed to decline invitation" };
+  }
+}
+
+// Update existing joinZone function to work with new system
+export async function joinZone(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
+  return requestToJoinZone(formData);
+}
+
+// Update existing leaveZone function
 export async function leaveZone(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
   const session = await auth();
 
@@ -483,3 +708,4 @@ export async function leaveZone(formData: FormData): Promise<{ error?: string; s
     return { error: e instanceof Error ? e.message : "Failed to leave zone" };
   }
 }
+

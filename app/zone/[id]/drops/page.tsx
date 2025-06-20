@@ -96,12 +96,12 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
     const response = await joinZone(formData)
     
     if (response.success) {
-      toast.success("Successfully joined zone!", {
+      toast.success("Join request sent to zone owner!", {
         position: "bottom-right",
       })
-      setIsMember(true)
+      // Don't set isMember to true yet - wait for acceptance
     } else {
-      toast.error("Failed to join zone", {
+      toast.error("Failed to request to join zone", {
         description: response.error,
         position: "bottom-right",
       })
@@ -218,7 +218,7 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
                     <div>
                       <h3 className="font-medium">Zone Membership</h3>
                       <p className="text-sm text-muted-foreground">
-                        {isMember ? "You are a member of this zone" : "You are not a member of this zone"}
+                        {isMember ? "You are a collaborator of this zone" : "Request to join as collaborator"}
                       </p>
                     </div>
                   </div>
@@ -240,7 +240,7 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
                         className="flex items-center space-x-2"
                       >
                         <UserPlus className="h-4 w-4" />
-                        <span>Join Zone</span>
+                        <span>Request to Join</span>
                       </Button>
                     )}
                   </div>
@@ -387,15 +387,15 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
                 <div className="flex flex-col items-center justify-center space-y-4">
                   <Shield className="h-16 w-16 text-muted-foreground/50" />
                   <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Join Zone to Create Drops</h3>
+                    <h3 className="text-lg font-semibold">Request to Join as Collaborator</h3>
                     <p className="text-muted-foreground">
-                      You need to be a member of this zone to create drops. Join the zone to start contributing!
+                      You need to request to join this zone as a collaborator to create drops. The zone owner will review your request.
                     </p>
                   </div>
                   {status === "authenticated" && (
                     <Button onClick={handleJoinZone} className="flex items-center space-x-2">
                       <UserPlus className="h-4 w-4" />
-                      <span>Join Zone</span>
+                      <span>Request to Join</span>
                     </Button>
                   )}
                 </div>

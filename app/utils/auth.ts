@@ -6,14 +6,23 @@ import { prisma } from "./db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  providers: [Google, GitHub],
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    GitHub({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+    }),
+  ],
   callbacks: {
     session: async ({ session, user }) => {
       // Include the user ID in the session
       if (session.user) {
-        session.user.id = user.id
+        session.user.id = user.id;
       }
-      return session
+      return session;
     },
     signIn: async ({ user, account }) => {
       if (!user.email) return false;

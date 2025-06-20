@@ -12,9 +12,10 @@ import DropCard from "@/app/components/DropCard"
 import ZoneMembership from "@/app/components/ZoneMembership"
 import { Suspense } from "react"
 import SkeltonCard from "@/app/components/SkeltonCard"
-import Pagination from "@/app/components/Pagination"
+import PaginationComponent from "@/app/components/Pagination"
 import { Settings, Plus, MessageSquare, Calendar } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import ZoneInvitations from "@/app/components/ZoneInvitations"
 
 const ITEMS_PER_PAGE = 2
 
@@ -154,6 +155,7 @@ async function updateDescription(formData: FormData) {
 
 async function ShowZoneItems({ zoneId, page }: { zoneId: string; page: number }) {
   const { count, data } = await getZoneDrops(zoneId, page)
+  const totalPages = Math.ceil(count / ITEMS_PER_PAGE)
 
   return (
     <>
@@ -168,39 +170,41 @@ async function ShowZoneItems({ zoneId, page }: { zoneId: string; page: number })
           </div>
         </Card>
       ) : (
-        <div className="space-y-5">
-          {data.map((point) => {
-            let parsedContent = null
-            if (point.textContent) {
-              try {
-                parsedContent =
-                  typeof point.textContent === "string" ? JSON.parse(point.textContent) : point.textContent
-              } catch (e) {
-                console.error(`Error parsing content for point ${point.id}:`, e)
+        <>
+          <div className="space-y-5">
+            {data.map((point) => {
+              let parsedContent = null
+              if (point.textContent) {
+                try {
+                  parsedContent =
+                    typeof point.textContent === "string" ? JSON.parse(point.textContent) : point.textContent
+                } catch (e) {
+                  console.error(`Error parsing content for point ${point.id}:`, e)
+                }
               }
-            }
 
-            return (
-              <DropCard
-                key={point.id}
-                id={point.id}
-                title={point.title}
-                jsonContent={parsedContent}
-                image={point.image}
-                subName={point.subName}
-                createdAt={point.createdAt}
-                boostCount={Math.max(
-                  0,
-                  point.Boost.reduce((acc, boost) => {
-                    return boost.type === "Boost" ? acc + 1 : acc - 1
-                  }, 0),
-                )}
-              />
-            )
-          })}
-        </div>
+              return (
+                <DropCard
+                  key={point.id}
+                  id={point.id}
+                  title={point.title}
+                  jsonContent={parsedContent}
+                  image={point.image}
+                  subName={point.subName}
+                  createdAt={point.createdAt}
+                  boostCount={Math.max(
+                    0,
+                    point.Boost.reduce((acc, boost) => {
+                      return boost.type === "Boost" ? acc + 1 : acc - 1
+                    }, 0),
+                  )}
+                />
+              )
+            })}
+          </div>
+          {data.length > 0 && totalPages > 1 && <PaginationComponent totalPages={totalPages} />}
+        </>
       )}
-      <Pagination totalPages={Math.ceil(count / ITEMS_PER_PAGE)} />
     </>
   )
 }
@@ -234,6 +238,9 @@ export default async function ZonePage({
         <div className="lg:col-span-2 space-y-6">
           {/* Zone Membership Component */}
           <ZoneMembership zoneName={zoneData.name} />
+
+          {/* Collaboration Invitations for Zone Owners */}
+          {isOwner && <ZoneInvitations zoneName={zoneData.name} isOwner={isOwner} />}
 
           {/* Show CreateDropCard for zone owners and members */}
           {isMember && session?.user?.id && <CreateDropCard zoneId={zoneData.id} />}

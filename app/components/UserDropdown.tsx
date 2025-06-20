@@ -1,96 +1,111 @@
 "use client"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, Settings, User } from "lucide-react"
-import { signOut } from "next-auth/react"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import Link from "next/link"
+import { signOut } from "next-auth/react"
+import { User, LogOut, Settings, LayoutDashboard, Users } from "lucide-react"
+import { useEffect, useState } from "react"
+import { getNotificationStatus } from "@/app/actions/profile"
+import { Badge } from "@/components/ui/badge"
+
 
 interface UserDropdownProps {
-  userImage: string
-  userName: string
-  userEmail: string
+  user: {
+    name?: string | null
+    image?: string | null
+    email?: string | null
+  }
 }
 
-export default function UserDropdown({ userImage, userName, userEmail }: UserDropdownProps) {
+export default function UserDropdown({ user }: UserDropdownProps) {
+    const [hasNotifications, setHasNotifications] = useState(false)
+
+    useEffect(() => {
+      const checkNotifications = async () => {
+        try {
+          const { hasNotifications } = await getNotificationStatus()
+          setHasNotifications(hasNotifications)
+        } catch (error) {
+            // Silently fail, don't bother the user with notification errors
+            console.error("Failed to check notification status:", error)
+        }
+      }
+  
+      checkNotifications()
+      const interval = setInterval(checkNotifications, 30000) // Poll every 30 seconds
+      return () => clearInterval(interval)
+    }, [])
+
   return (
-    <div className="w-10 h-10 flex-shrink-0">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="relative h-10 w-10 rounded-full hover:bg-accent/50 transition-all duration-200 hover:scale-105 ring-2 ring-transparent hover:ring-primary/20 focus-visible:ring-primary/20 flex-shrink-0"
-          >
-            <Avatar className="h-9 w-9 shadow-md ring-1 ring-border/20">
-              <AvatarImage src={userImage || "/placeholder.svg"} alt={userName} />
-              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold text-sm">
-                {userName ? userName.charAt(0).toUpperCase() : "U"}
-              </AvatarFallback>
-            </Avatar>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          className="w-64 shadow-xl border border-border/50 bg-background/95 backdrop-blur-sm rounded-lg"
-          align="end"
-          sideOffset={8}
-          avoidCollisions={true}
-          collisionPadding={8}
-          side="bottom"
-          alignOffset={0}
-        >
-          <DropdownMenuLabel className="font-normal p-4">
-            <div className="flex flex-col space-y-2">
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-10 w-10 shadow-sm">
-                  <AvatarImage src={userImage || "/placeholder.svg"} alt={userName} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold">
-                    {userName ? userName.charAt(0).toUpperCase() : "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-semibold leading-none">{userName || "User"}</p>
-                  <p className="text-xs leading-none text-muted-foreground truncate max-w-[150px]">
-                    {userEmail || "No email"}
-                  </p>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="relative flex items-center justify-center rounded-full overflow-hidden w-10 h-10 ring-2 ring-offset-2 ring-offset-background ring-primary/20 focus:outline-none focus:ring-primary">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={user.image || "/whisper.jpg"} alt={user.name || "User Avatar"} />
+            <AvatarFallback className="bg-primary/10 text-primary">
+              <User className="w-5 h-5" />
+            </AvatarFallback>
+          </Avatar>
+          {hasNotifications && (
+            <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-64" align="end">
+        <DropdownMenuLabel>
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{user.name}</p>
+            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <Link href="/profile">
+            <DropdownMenuItem className="cursor-pointer">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+          </Link>
+          <Link href="/settings">
+            <DropdownMenuItem className="cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+          </Link>
+          <Link href="/zone/setup">
+            <DropdownMenuItem className="cursor-pointer">
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <span>Create Zone</span>
+            </DropdownMenuItem>
+          </Link>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <Link href="/settings?tab=invitations">
+            <DropdownMenuItem className="cursor-pointer flex justify-between items-center">
+                <div className="flex items-center">
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>Invitations</span>
                 </div>
-              </div>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator className="mx-2" />
-          <div className="p-1">
-            <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors rounded-md p-3">
-              <Link href="/profile">
-                <User className="mr-3 h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Profile</span>
-              </Link>
+                {hasNotifications && <Badge variant="destructive" className="h-4 w-4 p-0 flex items-center justify-center text-xs">!</Badge>}
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors rounded-md p-3">
-              <Link href="/settings">
-                <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Settings</span>
-              </Link>
-            </DropdownMenuItem>
-          </div>
-          <DropdownMenuSeparator className="mx-2" />
-          <div className="p-1">
-            <DropdownMenuItem
-              className="cursor-pointer hover:bg-destructive/10 hover:text-destructive transition-colors rounded-md p-3"
-              onClick={() => signOut()}
-            >
-              <LogOut className="mr-3 h-4 w-4" />
-              <span className="font-medium">Log out</span>
-            </DropdownMenuItem>
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+          </Link>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="text-red-500 focus:text-red-500 focus:bg-red-500/10 cursor-pointer">
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

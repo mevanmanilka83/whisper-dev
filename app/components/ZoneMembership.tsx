@@ -44,12 +44,12 @@ export default function ZoneMembership({ zoneName }: ZoneMembershipProps) {
     const response = await joinZone(formData)
     
     if (response.success) {
-      toast.success("Successfully joined zone!", {
+      toast.success("Join request sent to zone owner!", {
         position: "bottom-right",
       })
-      setIsMember(true)
+      // Don't set isMember to true yet - wait for acceptance
     } else {
-      toast.error("Failed to join zone", {
+      toast.error("Failed to request to join zone", {
         description: response.error,
         position: "bottom-right",
       })
@@ -92,7 +92,7 @@ export default function ZoneMembership({ zoneName }: ZoneMembershipProps) {
             <div>
               <h3 className="font-medium text-sm">Zone Membership</h3>
               <p className="text-xs text-muted-foreground">
-                {isMember ? "You are a member" : "You are not a member"}
+                {isMember ? "You are a collaborator" : "Request to join as collaborator"}
               </p>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function ZoneMembership({ zoneName }: ZoneMembershipProps) {
                 className="flex items-center space-x-2 h-8 px-3"
               >
                 <UserPlus className="h-3 w-3" />
-                <span className="text-xs">Join</span>
+                <span className="text-xs">Request to Join</span>
               </Button>
             )}
           </div>

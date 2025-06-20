@@ -9,10 +9,14 @@ generator client {
 
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  profileId     String   @unique
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  bio           String?
+  location      String?
+  website       String?
   accounts      Account[]
   sessions      Session[]
   zones         Zone[]
@@ -21,6 +25,8 @@ model User {
   updatedAt     DateTime  @updatedAt
   Boost         Boost[]
   zoneMemberships ZoneMember[]
+  sentInvitations ZoneInvitation[] @relation("SentInvitations")
+  receivedInvitations ZoneInvitation[] @relation("ReceivedInvitations")
 }
 
 model Account {
@@ -65,6 +71,7 @@ model Zone {
   points      Point[]
   Boost       Boost[]
   members     ZoneMember[]
+  invitations ZoneInvitation[]
 
   @@unique([name, subName])
 }
@@ -73,6 +80,7 @@ model ZoneMember {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
   zoneId    String   @db.ObjectId
+  role      ZoneRole @default(COLLABORATOR)
   joinedAt  DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   zone      Zone     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
@@ -110,8 +118,37 @@ model Boost {
   type   TypeOfBoost
 }
 
+model ZoneInvitation {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  zoneId    String        @db.ObjectId
+  inviterId String        @db.ObjectId
+  inviteeId String        @db.ObjectId
+  status    InviteStatus  @default(PENDING)
+  message   String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  
+  zone      Zone          @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  inviter   User          @relation("SentInvitations", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee   User          @relation("ReceivedInvitations", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([zoneId, inviteeId])
+}
+
 enum TypeOfBoost {
   Boost
   Reduce
+}
+
+enum ZoneRole {
+  OWNER
+  COLLABORATOR
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
 }
 

@@ -52,6 +52,7 @@ export default function ClientShowItems({ page }: { page: number }) {
   }
 
   const ITEMS_PER_PAGE = 5
+  const totalPages = Math.ceil(count / ITEMS_PER_PAGE)
 
   return (
     <>
@@ -69,36 +70,38 @@ export default function ClientShowItems({ page }: { page: number }) {
           </div>
         </Card>
       ) : (
-        <div className="space-y-5">
-          {data.map((post) => {
-            let parsedContent = null
-            if (post.textContent) {
-              try {
-                parsedContent =
-                  typeof post.textContent === "string" ? JSON.parse(post.textContent) : post.textContent
-              } catch (e) {
-                console.error(`Error parsing content for post ${post.id}:`, e)
+        <>
+          <div className="space-y-5">
+            {data.map((post) => {
+              let parsedContent = null
+              if (post.textContent) {
+                try {
+                  parsedContent =
+                    typeof post.textContent === "string" ? JSON.parse(post.textContent) : post.textContent
+                } catch (e) {
+                  console.error(`Error parsing content for post ${post.id}:`, e)
+                }
               }
-            }
 
-            return (
-              <DropCard
-                key={post.id}
-                id={post.id}
-                title={post.title}
-                jsonContent={parsedContent}
-                image={post.image}
-                subName={post.subName}
-                createdAt={post.createdAt}
-                boostCount={post.boostCount}
-                userName={post.user?.name}
-                userImage={post.user?.image}
-              />
-            )
-          })}
-        </div>
+              return (
+                <DropCard
+                  key={post.id}
+                  id={post.id}
+                  title={post.title}
+                  jsonContent={parsedContent}
+                  image={post.image}
+                  subName={post.subName}
+                  createdAt={post.createdAt}
+                  boostCount={post.boostCount}
+                  userName={post.user?.name}
+                  userImage={post.user?.image}
+                />
+              )
+            })}
+          </div>
+          {data.length > 0 && totalPages > 1 && <Pagination totalPages={totalPages} />}
+        </>
       )}
-      <Pagination totalPages={Math.ceil(count / ITEMS_PER_PAGE)} />
     </>
   )
 } 

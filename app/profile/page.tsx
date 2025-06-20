@@ -17,20 +17,21 @@ import {
   Edit3,
   Shield,
   Activity,
-  Globe
+  Globe,
+  Share2
 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { updateProfile, getUserStats, getUserActivity, getUserZones } from "@/app/actions/profile"
+import { getUserStats, getUserActivity, getUserZones, getUserProfile, updateProfile } from "@/app/actions/profile"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
+import SubmitButton from "@/app/components/SubmitButton"
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [profileData, setProfileData] = useState({
     name: "",
     email: "",
@@ -65,6 +66,8 @@ export default function ProfilePage() {
     _count: { points: number }
   }>>([])
 
+  const [profileId, setProfileId] = useState<string | null>(null)
+
   // Update profile data when session loads
   useEffect(() => {
     if (session?.user) {
@@ -90,12 +93,33 @@ export default function ProfilePage() {
     
     if (session?.user?.id) {
       const userId = session.user.id
+      console.log("Session user:", session.user)
+      console.log("Using userId:", userId)
       
       const fetchData = async () => {
         try {
-          const statsData = await getUserStats(userId)
-          const activityData = await getUserActivity(userId)
-          const zonesData = await getUserZones(userId)
+          const [profileData, statsData, activityData, zonesData] = await Promise.all([
+            getUserProfile(userId),
+            getUserStats(userId),
+            getUserActivity(userId),
+            getUserZones(userId)
+          ])
+          
+          // Update profile data with complete user info
+          if (profileData) {
+            setProfileData(prev => ({
+              ...prev,
+              name: profileData.name || "",
+              email: profileData.email || "",
+              avatar: profileData.image || "/whisper.jpg",
+              bio: profileData.bio || "",
+              location: profileData.location || "",
+              website: profileData.website || ""
+            }))
+            // Set profileId from the profile data
+            console.log("Setting profileId:", profileData.profileId)
+            setProfileId(profileData.profileId || null)
+          }
           
           // Ensure stats data is valid
           const validStats = {
@@ -168,13 +192,8 @@ export default function ProfilePage() {
     )
   }
 
-  const handleSave = async () => {
-    setIsLoading(true)
+  const handleSave = async (formData: FormData) => {
     try {
-      const formData = new FormData()
-      formData.append("name", profileData.name)
-      formData.append("email", profileData.email)
-
       const result = await updateProfile(formData)
       
       if (result.success) {
@@ -185,8 +204,6 @@ export default function ProfilePage() {
       }
     } catch {
       toast.error("An error occurred while updating profile")
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -195,6 +212,31 @@ export default function ProfilePage() {
     if (file) {
       // Handle avatar upload logic here
       console.log("Avatar file selected:", file.name)
+    }
+  }
+
+  const handleShareProfile = async () => {
+    try {
+      console.log("Share button clicked, profileId:", profileId)
+      if (!profileId) {
+        toast.error("Profile ID not available yet. Please try again in a moment.", {
+          position: "bottom-right",
+        })
+        return
+      }
+      
+      const baseUrl = window.location.origin
+      const shareUrl = `${baseUrl}/profile/${profileId}`
+      console.log("Sharing URL:", shareUrl)
+      await navigator.clipboard.writeText(shareUrl)
+      toast.success("Profile link copied to clipboard!", {
+        position: "bottom-right",
+      })
+    } catch (error) {
+      console.error("Failed to copy profile link:", error)
+      toast.error("Failed to copy profile link", {
+        position: "bottom-right",
+      })
     }
   }
 
@@ -239,29 +281,43 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div className="absolute top-4 right-4">
-                <Button
-                  variant={isEditing ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      Saving...
-                    </>
-                  ) : isEditing ? (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Changes
-                    </>
-                  ) : (
-                    <>
+                {isEditing ? (
+                  <form action={handleSave}>
+                    <input type="hidden" name="name" value={profileData.name} />
+                    <input type="hidden" name="bio" value={profileData.bio} />
+                    <input type="hidden" name="location" value={profileData.location} />
+                    <input type="hidden" name="website" value={profileData.website} />
+                    <SubmitButton
+                      text="Save Changes"
+                      loadingText="Saving..."
+                      variant="default"
+                      size="sm"
+                      icon={<Save className="h-4 w-4" />}
+                    />
+                  </form>
+                ) : (
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleShareProfile}
+                      disabled={!profileId}
+                      className="flex items-center space-x-2"
+                      title={!profileId ? "Profile ID not available yet" : "Share your profile"}
+                    >
+                      <Share2 className="h-4 w-4" />
+                      <span>Share</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditing(true)}
+                    >
                       <Edit3 className="h-4 w-4 mr-2" />
                       Edit Profile
-                    </>
-                  )}
-                </Button>
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </Card>
@@ -300,9 +356,12 @@ export default function ProfilePage() {
                         id="email"
                         type="email"
                         value={profileData.email}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                        disabled={!isEditing}
+                        disabled={true}
+                        className="bg-muted/50"
                       />
+                      <p className="text-xs text-muted-foreground">
+                        Email cannot be changed as it&apos;s used for authentication
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-2">
