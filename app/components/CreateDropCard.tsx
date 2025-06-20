@@ -24,7 +24,7 @@ export default function CreateDropCard({ zoneId }: CreateDropCardProps) {
 
         {/* Input */}
         <div className="flex-1">
-          <Link href={zoneId ? `/zone/${zoneId}/drops` : "/communities/VR_46/post"}>
+          <Link href={zoneId ? `/zone/${zoneId}/drops` : "/zone/setup"}>
             <Input
               placeholder="What's happening?"
               className="w-full bg-muted/50 hover:bg-muted/70 transition-colors border-0 focus-visible:ring-1 focus-visible:ring-primary h-10 text-sm rounded-full px-4"
@@ -41,7 +41,7 @@ export default function CreateDropCard({ zoneId }: CreateDropCardProps) {
             className="h-9 w-9 p-0 hover:bg-muted/70 text-muted-foreground hover:text-foreground rounded-full"
             asChild
           >
-            <Link href={zoneId ? `/zone/${zoneId}/drops` : "/communities/VR_46/post"}>
+            <Link href={zoneId ? `/zone/${zoneId}/drops` : "/zone/setup"}>
               <ImageIcon className="h-4 w-4" />
             </Link>
           </Button>
@@ -52,7 +52,7 @@ export default function CreateDropCard({ zoneId }: CreateDropCardProps) {
             className="h-9 w-9 p-0 hover:bg-primary/10 text-primary hover:text-primary rounded-full"
             asChild
           >
-            <Link href={zoneId ? `/zone/${zoneId}/drops` : "/communities/VR_46/post"}>
+            <Link href={zoneId ? `/zone/${zoneId}/drops` : "/zone/setup"}>
               <Link2 className="h-4 w-4" />
             </Link>
           </Button>

@@ -60,7 +60,10 @@ export async function deleteZone(prevState: ActionState, formData: FormData) {
   const session = await auth();
 
   if (!session?.user) {
-    return redirect("/api/auth/signin");
+    return {
+      message: "Not authenticated",
+      error: true,
+    };
   }
 
   try {
@@ -84,7 +87,10 @@ export async function deleteZone(prevState: ActionState, formData: FormData) {
       },
     });
 
-    return redirect("/");
+    return {
+      message: "Zone deleted successfully",
+      error: false,
+    };
   } catch (e) {
     console.error(e);
     return {
@@ -195,7 +201,7 @@ export async function createPoint(
 ): Promise<{ error?: string; success?: boolean; pointId?: string }> {
   const session = await auth();
 
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return redirect("/api/auth/signin");
   }
 
@@ -215,6 +221,23 @@ export async function createPoint(
 
     if (!zone) {
       throw new Error(`Zone with name ${zoneName} not found.`);
+    }
+
+    // Check if user is a member of the zone
+    const membership = await prisma.zoneMember.findUnique({
+      where: {
+        userId_zoneId: {
+          userId: session.user.id,
+          zoneId: zone.id,
+        },
+      },
+    });
+
+    // Check if user is the zone owner
+    const isZoneOwner = zone.userId === session.user.id;
+
+    if (!membership && !isZoneOwner) {
+      throw new Error("You must be a member of this zone to create points. Please join the zone first.");
     }
 
     const point = await prisma.point.create({
@@ -241,7 +264,7 @@ export async function createPoint(
         };
       }
     }
-    return { error: "Failed to create point" };
+    return { error: e instanceof Error ? e.message : "Failed to create point" };
   }
 }
 
@@ -346,5 +369,117 @@ export async function handleBoost(formData: FormData) {
   } catch (error) {
     console.error("Error handling boost/reduce action:", error);
     revalidatePath("/");
+  }
+}
+
+export async function joinZone(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return redirect("/api/auth/signin");
+  }
+
+  try {
+    const zoneName = formData.get("zoneName")?.toString().trim();
+
+    if (!zoneName) {
+      throw new Error("Zone name is required.");
+    }
+
+    const zone = await prisma.zone.findUnique({
+      where: { name: zoneName },
+    });
+
+    if (!zone) {
+      throw new Error(`Zone with name ${zoneName} not found.`);
+    }
+
+    // Check if user is already a member
+    const existingMembership = await prisma.zoneMember.findUnique({
+      where: {
+        userId_zoneId: {
+          userId: session.user.id,
+          zoneId: zone.id,
+        },
+      },
+    });
+
+    if (existingMembership) {
+      return { error: "You are already a member of this zone." };
+    }
+
+    // Create membership
+    await prisma.zoneMember.create({
+      data: {
+        userId: session.user.id,
+        zoneId: zone.id,
+      },
+    });
+
+    return {
+      success: true,
+      message: `Successfully joined ${zoneName}!`,
+    };
+  } catch (e) {
+    console.error("Error joining zone:", e);
+    return { error: e instanceof Error ? e.message : "Failed to join zone" };
+  }
+}
+
+export async function leaveZone(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return redirect("/api/auth/signin");
+  }
+
+  try {
+    const zoneName = formData.get("zoneName")?.toString().trim();
+
+    if (!zoneName) {
+      throw new Error("Zone name is required.");
+    }
+
+    const zone = await prisma.zone.findUnique({
+      where: { name: zoneName },
+    });
+
+    if (!zone) {
+      throw new Error(`Zone with name ${zoneName} not found.`);
+    }
+
+    // Check if user is the zone owner
+    if (zone.userId === session.user.id) {
+      return { error: "Zone owners cannot leave their own zone." };
+    }
+
+    // Check if user is a member
+    const membership = await prisma.zoneMember.findUnique({
+      where: {
+        userId_zoneId: {
+          userId: session.user.id,
+          zoneId: zone.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return { error: "You are not a member of this zone." };
+    }
+
+    // Remove membership
+    await prisma.zoneMember.delete({
+      where: {
+        id: membership.id,
+      },
+    });
+
+    return {
+      success: true,
+      message: `Successfully left ${zoneName}.`,
+    };
+  } catch (e) {
+    console.error("Error leaving zone:", e);
+    return { error: e instanceof Error ? e.message : "Failed to leave zone" };
   }
 }

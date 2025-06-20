@@ -45,14 +45,16 @@ export function ZoneDescriptionpage({
   return (
     <form onSubmit={handleSubmit}>
       <input type="hidden" name="zoneId" value={zoneId} />
-      <Textarea
-        placeholder="Add a description for this zone"
-        maxLength={100}
-        name="description"
-        defaultValue={description}
-      />
+      <div className="space-y-3">
+        <Textarea
+          placeholder="Add a description for this zone"
+          maxLength={100}
+          name="description"
+          defaultValue={description}
+        />
 
-      <SaveButton />
+        <SaveButton />
+      </div>
     </form>
   );
 }

@@ -23,9 +23,21 @@ interface DropCardProps {
   image: string | null
   subName: string | null
   boostCount: number
+  userName?: string | null
+  userImage?: string | null
 }
 
-export default function DropCard({ id, title, jsonContent, createdAt, image, subName, boostCount }: DropCardProps) {
+export default function DropCard({ 
+  id, 
+  title, 
+  jsonContent, 
+  createdAt, 
+  image, 
+  subName, 
+  boostCount,
+  userName = "VR_46",
+  userImage = "/whisper.jpg"
+}: DropCardProps) {
   // Show skeleton if required data is missing
   if (!title || !jsonContent) {
     return <SkeltonCard />
@@ -43,13 +55,15 @@ export default function DropCard({ id, title, jsonContent, createdAt, image, sub
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <Avatar className="h-8 w-8 ring-2 ring-border/20">
-              <AvatarImage src="/whisper.jpg" alt="User avatar" />
+              <AvatarImage src={userImage || undefined} alt="User avatar" />
               <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
                 <User className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-sm font-medium hover:text-primary cursor-pointer transition-colors">VR_46</span>
+              <span className="text-sm font-medium hover:text-primary cursor-pointer transition-colors">
+                {userName || "VR_46"}
+              </span>
               <div className="flex items-center text-xs text-muted-foreground">
                 <Clock className="h-3 w-3 mr-1" />
                 {formattedDate}
@@ -60,8 +74,11 @@ export default function DropCard({ id, title, jsonContent, createdAt, image, sub
             <Badge
               variant="secondary"
               className="bg-primary/10 hover:bg-primary/15 text-primary border-primary/20 px-3 py-1 text-xs font-medium"
+              asChild
             >
-              zone/{subName}
+              <Link href={`/zone/${subName}`}>
+                zone/{subName}
+              </Link>
             </Badge>
           )}
         </div>
@@ -105,7 +122,7 @@ export default function DropCard({ id, title, jsonContent, createdAt, image, sub
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-110"
-                  title="Boost this drop"
+                  title="Boost this point"
                   type="submit"
                 >
                   <Rocket className="w-4 h-4" />
@@ -121,7 +138,7 @@ export default function DropCard({ id, title, jsonContent, createdAt, image, sub
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive transition-all duration-200 hover:scale-110"
-                  title="Reduce this drop"
+                  title="Reduce this point"
                   type="submit"
                 >
                   <Anchor className="w-4 h-4" />

@@ -5,7 +5,6 @@ import type { SVGProps } from "react"
 import SubmitButton from "./SubmitButton"
 import { signIn } from "next-auth/react"
 import { useSession } from "next-auth/react"
-import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import SignInSkeleton from "./SignInSkeleton"
 
@@ -56,19 +55,15 @@ const Google = (props: SVGProps<SVGSVGElement>) => (
 export function SignIn() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    if (status === "loading") {
-      setIsLoading(true)
-    } else if (status === "authenticated" && session?.user) {
-      router.push("/")
-    } else {
-      setIsLoading(false)
-    }
-  }, [status, session, router])
+  // Show skeleton while loading or if status is loading
+  if (status === "loading") {
+    return <SignInSkeleton />
+  }
 
-  if (isLoading) {
+  // Redirect if already authenticated
+  if (status === "authenticated" && session?.user) {
+    router.push("/")
     return <SignInSkeleton />
   }
 

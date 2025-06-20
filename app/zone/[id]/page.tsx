@@ -9,6 +9,7 @@ import { redirect } from "next/navigation"
 import { ZoneDescriptionpage } from "@/app/components/ZoneDescription"
 import CreateDropCard from "@/app/components/CreateDropCard"
 import DropCard from "@/app/components/DropCard"
+import ZoneMembership from "@/app/components/ZoneMembership"
 import { Suspense } from "react"
 import SkeltonCard from "@/app/components/SkeltonCard"
 import Pagination from "@/app/components/Pagination"
@@ -57,6 +58,35 @@ async function getZoneData(id: string, userId?: string) {
   } catch (error) {
     console.error("Error fetching zone:", error)
     return null
+  }
+}
+
+async function checkZoneMembership(zoneId: string, userId: string) {
+  try {
+    // Check if user is the zone owner
+    const zone = await prisma.zone.findUnique({
+      where: { id: zoneId },
+      select: { userId: true }
+    })
+
+    if (zone?.userId === userId) {
+      return true // Zone owners are automatically members
+    }
+
+    // Check if user is a member
+    const membership = await prisma.zoneMember.findUnique({
+      where: {
+        userId_zoneId: {
+          userId: userId,
+          zoneId: zoneId,
+        },
+      },
+    })
+
+    return !!membership
+  } catch (error) {
+    console.error("Error checking zone membership:", error)
+    return false
   }
 }
 
@@ -179,11 +209,12 @@ export default async function ZonePage({
   params,
   searchParams,
 }: {
-  params: { id: string }
-  searchParams: { page?: string }
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ page?: string }>
 }) {
   const { id } = await params
-  const page = await searchParams.page
+  const resolvedSearchParams = await searchParams
+  const page = resolvedSearchParams.page
   const currentPage = Number(page) || 1
   const session = await auth()
 
@@ -195,12 +226,17 @@ export default async function ZonePage({
   }
 
   const isOwner = session?.user?.id === zoneData.userId
+  const isMember = session?.user?.id ? await checkZoneMembership(zoneData.id, session.user.id) : false
 
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          {session?.user?.id && <CreateDropCard zoneId={zoneData.id} />}
+          {/* Zone Membership Component */}
+          <ZoneMembership zoneName={zoneData.name} />
+
+          {/* Show CreateDropCard for zone owners and members */}
+          {isMember && session?.user?.id && <CreateDropCard zoneId={zoneData.id} />}
 
           <Suspense fallback={<SkeltonCard />}>
             <ShowZoneItems zoneId={zoneData.id} page={currentPage} />
@@ -209,17 +245,16 @@ export default async function ZonePage({
 
         <div className="lg:col-span-1">
           <div className="sticky top-20">
-            <Card className="overflow-hidden border-none shadow-lg rounded-xl">
+            <Card className="bg-card text-card-foreground flex flex-col gap-1 border py-0 overflow-hidden border-none shadow-lg rounded-xl">
               <div className="relative">
                 <Image
-                  src="/banner.jpg"
                   alt="Zone Banner"
-                  className="w-full h-36 object-cover"
                   width={400}
                   height={144}
+                  className="w-full h-36 object-cover"
+                  src="/banner.jpg"
                   priority
                 />
-
                 <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-4">
                   <div className="flex items-center space-x-3">
                     <Image
@@ -240,7 +275,6 @@ export default async function ZonePage({
                   </div>
                 </div>
               </div>
-
               <div className="p-6">
                 <div className="mb-5">
                   {isOwner ? (

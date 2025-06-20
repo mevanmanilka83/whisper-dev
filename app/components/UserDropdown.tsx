@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { LogOut, Settings, User } from "lucide-react"
 import { signOut } from "next-auth/react"
+import Link from "next/link"
 
 interface UserDropdownProps {
   userImage: string
@@ -65,13 +66,17 @@ export default function UserDropdown({ userImage, userName, userEmail }: UserDro
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="mx-2" />
           <div className="p-1">
-            <DropdownMenuItem className="cursor-pointer hover:bg-accent/50 transition-colors rounded-md p-3">
-              <User className="mr-3 h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">Profile</span>
+            <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors rounded-md p-3">
+              <Link href="/profile">
+                <User className="mr-3 h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Profile</span>
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer hover:bg-accent/50 transition-colors rounded-md p-3">
-              <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">Settings</span>
+            <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors rounded-md p-3">
+              <Link href="/settings">
+                <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Settings</span>
+              </Link>
             </DropdownMenuItem>
           </div>
           <DropdownMenuSeparator className="mx-2" />
