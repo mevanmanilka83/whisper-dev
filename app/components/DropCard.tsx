@@ -73,10 +73,6 @@ export default function DropCard({ id, title, jsonContent, createdAt, image, sub
               {title}
             </h2>
 
-            <div className="text-content prose prose-sm dark:prose-invert w-full overflow-hidden break-words">
-              <Render data={parsedContent} />
-            </div>
-
             {image && (
               <div className="mt-4 rounded-lg overflow-hidden bg-muted/20 shadow-sm">
                 <Image
@@ -88,6 +84,10 @@ export default function DropCard({ id, title, jsonContent, createdAt, image, sub
                 />
               </div>
             )}
+
+            <div className="text-content prose prose-sm dark:prose-invert w-full overflow-hidden break-words">
+              <Render data={parsedContent} />
+            </div>
           </div>
         </Link>
 
