@@ -10,6 +10,8 @@
 
 ## Overview
 
+---
+
 Whisper is a modern collaborative platform that reimagines how people connect, share, and collaborate online. At its core, Whisper is built around the concept of "zones" - dedicated spaces where communities can form around shared interests, ideas, or projects.
 
 ### The Whisper Experience
