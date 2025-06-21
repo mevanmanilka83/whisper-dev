@@ -80,14 +80,14 @@ async function PointData({ id }: { id: string }) {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8 ring-2 ring-border/20">
-                      <AvatarImage src="/whisper.jpg" alt="User avatar" />
+                      <AvatarImage src={point.user?.image || undefined} alt="User avatar" />
                       <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
                         <User className="h-4 w-4" />
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium hover:text-primary cursor-pointer transition-colors">
-                        Posted by {point.user?.name || 'VR_46'}
+                        Posted by {point.user?.name || 'Anonymous'}
                       </span>
                       <div className="flex items-center text-xs text-muted-foreground">
                         <Clock className="h-3 w-3 mr-1" />

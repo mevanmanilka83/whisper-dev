@@ -34,8 +34,8 @@ export default function DropCard({
   image, 
   subName, 
   boostCount,
-  userName = "VR_46",
-  userImage = "/whisper.jpg"
+  userName,
+  userImage
 }: DropCardProps) {
   // Show skeleton if required data is missing
   if (!title || !jsonContent) {
@@ -61,7 +61,7 @@ export default function DropCard({
             </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-medium hover:text-primary cursor-pointer transition-colors">
-                {userName || "VR_46"}
+                {userName || "Anonymous"}
               </span>
               <div className="flex items-center text-xs text-muted-foreground">
                 <Clock className="h-3 w-3 mr-1" />

@@ -204,6 +204,8 @@ async function ShowZoneItems({ zoneId, page }: { zoneId: string; page: number })
                     return boost.type === "Boost" ? acc + 1 : acc - 1
                   }, 0),
                 )}
+                userName={point.user?.name}
+                userImage={point.user?.image}
               />
             )
           })}
