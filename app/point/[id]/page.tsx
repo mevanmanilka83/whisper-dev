@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
-import CopyLink from "@/app/components/CopyLink"
 
 async function getPoint(id: string) {
   const point = await prisma.point.findUnique({
@@ -194,9 +193,6 @@ async function PointData({ id }: { id: string }) {
                       </Link>
                     </Button>
                   </div>
-
-                  {/* Copy Link */}
-                  <CopyLink id={id} />
                 </div>
               </div>
             </Card>

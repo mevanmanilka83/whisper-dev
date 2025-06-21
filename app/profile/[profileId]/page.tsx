@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Globe, Calendar, User } from 'lucide-react';
+import { getUserStats, getUserActivity } from '@/app/actions/profile';
+import CopyLink from '@/app/components/CopyLink';
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ profileId: string }> }) {
   const { profileId } = await params;
@@ -10,6 +12,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const user = await prisma.user.findUnique({
     where: { profileId },
     select: {
+      id: true, // Add id to fetch stats/activity
       name: true,
       image: true,
       bio: true,
@@ -20,6 +23,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   });
 
   if (!user) return notFound();
+
+  // Fetch stats and activity
+  const stats = await getUserStats(user.id);
+  const activity = await getUserActivity(user.id);
 
   return (
     <div className="container max-w-4xl mx-auto py-12 px-4">
@@ -47,7 +54,16 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             </div>
             
             <CardContent className="pt-16 pb-6 text-center">
-              <CardTitle className="text-xl font-bold mb-2">{user.name || 'User'}</CardTitle>
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <CardTitle className="text-xl font-bold">{user.name || 'User'}</CardTitle>
+                <CopyLink 
+                  url={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profile/${profileId}`}
+                  label="Share Profile"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2"
+                />
+              </div>
               
               {user.bio && (
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">
@@ -102,15 +118,15 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-2xl font-bold text-primary">{stats.points}</div>
                   <div className="text-sm text-muted-foreground">Posts</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-2xl font-bold text-primary">{stats.zones}</div>
                   <div className="text-sm text-muted-foreground">Zones</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-2xl font-bold text-primary">{stats.boosts}</div>
                   <div className="text-sm text-muted-foreground">Boosts</div>
                 </div>
               </div>
@@ -123,13 +139,32 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               <CardTitle>Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                  <User className="h-8 w-8 text-muted-foreground/50" />
+              {activity.length > 0 ? (
+                <ul className="divide-y divide-border">
+                  {activity.map((item) => (
+                    <li key={item.id} className="py-4">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-primary" />
+                        <span className="font-medium">{item.title}</span>
+                        <span className="text-xs text-muted-foreground ml-2">
+                          in {item.zoneName} • {new Date(item.createdAt).toLocaleDateString()}
+                        </span>
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          +{item.boostCount} boosts
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
+                    <User className="h-8 w-8 text-muted-foreground/50" />
+                  </div>
+                  <p className="text-muted-foreground">No recent activity yet</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">When {user.name || 'this user'} starts sharing, their activity will appear here.</p>
                 </div>
-                <p className="text-muted-foreground">No recent activity yet</p>
-                <p className="text-sm text-muted-foreground/70 mt-1">When {user.name || 'this user'} starts sharing, their activity will appear here.</p>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>

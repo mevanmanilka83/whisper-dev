@@ -1,25 +1,60 @@
 "use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Share } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 import { toast } from "sonner";
-export default function CopyLink({ id }: { id: string }) {
-  async function copyToClipboard() {
-    await navigator.clipboard.writeText(`${window.location.origin}/point/${id}`);
-    toast.success("Link copied to clipboard!", {
-      description: "You can now share this link with others.",
-    });
-  }
+
+interface CopyLinkProps {
+  url: string;
+  label?: string;
+  variant?: "default" | "outline" | "ghost";
+  size?: "default" | "sm" | "lg";
+  className?: string;
+}
+
+export default function CopyLink({
+  url,
+  label = "Copy Link",
+  variant = "outline",
+  size = "sm",
+  className = ""
+}: CopyLinkProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success("Link copied to clipboard!");
+
+      // Reset the copied state after 2 seconds
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy link:", error);
+      toast.error("Failed to copy link");
+    }
+  };
+
   return (
-    <div>
-      <Button
-        onClick={copyToClipboard}
-        variant="ghost"
-        size="sm"
-        className="h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors px-2 ml-auto"
-      >
-        <Share className="w-3.5 h-3.5" />
-        <span className="text-xs"> Share</span>
-      </Button>
-    </div>
+    <Button
+      variant={variant}
+      size={size}
+      onClick={handleCopy}
+      className={className}
+      disabled={copied}
+    >
+      {copied ? (
+        <>
+          <Check className="h-4 w-4 mr-2" />
+          Copied!
+        </>
+      ) : (
+        <>
+          <Copy className="h-4 w-4 mr-2" />
+          {label}
+        </>
+      )}
+    </Button>
   );
 }

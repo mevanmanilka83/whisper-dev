@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 
-import CopyLink from "./CopyLink"
 import { handleBoost } from "../actions/actions"
 import Render from "./Render"
 import SkeltonCard from "./SkeltonCard"
@@ -161,9 +160,6 @@ export default function DropCard({
               </Link>
             </Button>
           </div>
-
-          {/* Copy Link */}
-          <CopyLink id={id} />
         </div>
       </div>
     </Card>

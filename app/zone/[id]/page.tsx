@@ -16,6 +16,7 @@ import PaginationComponent from "@/app/components/Pagination"
 import { Settings, Plus, MessageSquare, Calendar } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import ZoneInvitations from "@/app/components/ZoneInvitations"
+import CopyLink from "@/app/components/CopyLink"
 
 const ITEMS_PER_PAGE = 2
 
@@ -268,22 +269,31 @@ export default async function ZonePage({
                   priority
                 />
                 <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-4">
-                  <div className="flex items-center space-x-3">
-                    <Image
-                      src={`https://avatar.vercel.sh/${zoneData.name}/`}
-                      alt={`${zoneData.name} avatar`}
-                      className="w-10 h-10 rounded-full border-2 border-white shadow-md"
-                      width={40}
-                      height={40}
-                    />
-                    <div>
-                      <h1 className="font-semibold text-white text-lg">{zoneData.name}</h1>
-                      {isOwner && (
-                        <Badge variant="secondary" className="text-xs mt-1">
-                          Owner
-                        </Badge>
-                      )}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Image
+                        src={`https://avatar.vercel.sh/${zoneData.name}/`}
+                        alt={`${zoneData.name} avatar`}
+                        className="w-10 h-10 rounded-full border-2 border-white shadow-md"
+                        width={40}
+                        height={40}
+                      />
+                      <div>
+                        <h1 className="font-semibold text-white text-lg">{zoneData.name}</h1>
+                        {isOwner && (
+                          <Badge variant="secondary" className="text-xs mt-1">
+                            Owner
+                          </Badge>
+                        )}
+                      </div>
                     </div>
+                    <CopyLink 
+                      url={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/zone/${zoneData.name}`}
+                      label="Share"
+                      variant="outline"
+                      size="sm"
+                      className="bg-white/20 hover:bg-white/30 text-white border-white/40 hover:border-white/60 shadow-lg backdrop-blur-sm"
+                    />
                   </div>
                 </div>
               </div>
