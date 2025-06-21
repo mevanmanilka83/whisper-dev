@@ -16,7 +16,6 @@ import { User, LogOut, Users, ExternalLink } from "lucide-react"
 import { useEffect, useState } from "react"
 import { getNotificationStatus, getUserZoneMemberships, getUserOwnedZones } from "@/app/actions/profile"
 import { Badge } from "@/components/ui/badge"
-import { formatDistanceToNow } from "date-fns"
 
 
 interface UserDropdownProps {
@@ -129,7 +128,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
             <DropdownMenuItem className="cursor-pointer flex justify-between items-center">
                 <div className="flex items-center">
                     <Users className="mr-2 h-4 w-4" />
-                    <span>Invitations</span>
+                    <span>Collaboration Invitations & Join Requests</span>
           </div>
                 {invitationCount > 0 && <Badge variant="destructive" className="h-4 w-4 p-0 flex items-center justify-center text-xs">{invitationCount}</Badge>}
             </DropdownMenuItem>

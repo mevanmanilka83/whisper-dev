@@ -6,6 +6,7 @@ import "./globals.css"
 import Navbar from "./components/Navbar"
 import { ThemeProvider } from "./components/theme-provider"
 import { AuthProvider } from "./components/auth-provider"
+import ChatBox from "./components/ChatBox"
 import { Github } from "lucide-react"
 
 const geistSans = Geist({
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
               </footer>
             </div>
+            <ChatBox />
             <Toaster position="bottom-right" />
           </ThemeProvider>
         </AuthProvider>
