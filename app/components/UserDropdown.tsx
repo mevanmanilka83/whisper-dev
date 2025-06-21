@@ -27,13 +27,13 @@ interface UserDropdownProps {
 }
 
 export default function UserDropdown({ user }: UserDropdownProps) {
-    const [hasNotifications, setHasNotifications] = useState(false)
+    const [invitationCount, setInvitationCount] = useState(0)
 
     useEffect(() => {
       const checkNotifications = async () => {
         try {
-          const { hasNotifications } = await getNotificationStatus()
-          setHasNotifications(hasNotifications)
+          const { count } = await getNotificationStatus()
+          setInvitationCount(count)
         } catch (error) {
             // Silently fail, don't bother the user with notification errors
             console.error("Failed to check notification status:", error)
@@ -42,21 +42,31 @@ export default function UserDropdown({ user }: UserDropdownProps) {
   
       checkNotifications()
       const interval = setInterval(checkNotifications, 30000) // Poll every 30 seconds
-      return () => clearInterval(interval)
+
+      // Listen for manual refresh event
+      const refreshListener = () => checkNotifications()
+      window.addEventListener("refresh-notifications", refreshListener)
+
+      return () => {
+        clearInterval(interval)
+        window.removeEventListener("refresh-notifications", refreshListener)
+      }
     }, [])
 
   return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-        <button className="relative flex items-center justify-center rounded-full overflow-hidden w-10 h-10 ring-2 ring-offset-2 ring-offset-background ring-primary/20 focus:outline-none focus:ring-primary">
+        <button className="relative flex items-center justify-center rounded-full w-10 h-10 ring-2 ring-offset-2 ring-offset-background ring-primary/20 focus:outline-none focus:ring-primary">
           <Avatar className="h-10 w-10">
             <AvatarImage src={user.image || "/whisper.jpg"} alt={user.name || "User Avatar"} />
             <AvatarFallback className="bg-primary/10 text-primary">
               <User className="w-5 h-5" />
               </AvatarFallback>
             </Avatar>
-          {hasNotifications && (
-            <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
+          {invitationCount > 0 && (
+            <span className="absolute -top-1 -right-1 block min-w-[1.5em] h-5 px-1 rounded-full bg-red-500 text-white text-xs flex items-center justify-center ring-2 ring-white">
+              {invitationCount}
+            </span>
           )}
         </button>
         </DropdownMenuTrigger>
@@ -84,7 +94,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                     <Users className="mr-2 h-4 w-4" />
                     <span>Invitations</span>
           </div>
-                {hasNotifications && <Badge variant="destructive" className="h-4 w-4 p-0 flex items-center justify-center text-xs">!</Badge>}
+                {invitationCount > 0 && <Badge variant="destructive" className="h-4 w-4 p-0 flex items-center justify-center text-xs">{invitationCount}</Badge>}
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>

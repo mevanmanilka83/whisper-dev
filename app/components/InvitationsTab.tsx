@@ -42,6 +42,7 @@ export default function InvitationsTab() {
       if (response.success) {
         toast.success(`Invitation ${action}ed successfully!`)
         fetchInvitations()
+        window.dispatchEvent(new Event("refresh-notifications"))
       } else {
         toast.error(`Failed to ${action} invitation`, { description: response.error })
       }

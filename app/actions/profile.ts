@@ -268,7 +268,7 @@ export async function getUserProfile(userId: string) {
 export async function getNotificationStatus() {
   const session = await auth()
   if (!session?.user?.id) {
-    return { hasNotifications: false }
+    return { count: 0 }
   }
 
   const invitationCount = await prisma.zoneInvitation.count({
@@ -279,7 +279,7 @@ export async function getNotificationStatus() {
   })
 
   return {
-    hasNotifications: invitationCount > 0,
+    count: invitationCount,
   }
 }
 
