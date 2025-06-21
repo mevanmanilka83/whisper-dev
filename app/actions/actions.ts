@@ -649,6 +649,9 @@ export async function declineInvitation(formData: FormData): Promise<{ error?: s
 
     const invitation = await prisma.zoneInvitation.findUnique({
       where: { id: invitationId },
+      include: {
+        zone: true,
+      },
     });
 
     if (!invitation) {
@@ -657,7 +660,7 @@ export async function declineInvitation(formData: FormData): Promise<{ error?: s
 
     // Check if user is the invitee or zone owner
     const isInvitee = invitation.inviteeId === session.user.id;
-    const isZoneOwner = invitation.zoneId === session.user.id;
+    const isZoneOwner = invitation.zone.userId === session.user.id;
 
     if (!isInvitee && !isZoneOwner) {
       throw new Error("You are not authorized to decline this invitation.");

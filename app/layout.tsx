@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   title: "WHISPER",
   description: "Whisper Dev Application",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/public/favicon.ico",
   },
 }
 

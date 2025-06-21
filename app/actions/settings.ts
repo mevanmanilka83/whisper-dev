@@ -57,10 +57,21 @@ export async function acceptInvitation({ invitationId }: { invitationId: string 
   try {
     const invitation = await prisma.zoneInvitation.findUnique({
       where: { id: invitationId },
+      include: {
+        zone: true,
+      },
     })
 
-    if (!invitation || invitation.inviteeId !== session.user.id) {
-      return { error: "Invitation not found or you are not the invitee." }
+    if (!invitation) {
+      return { error: "Invitation not found." }
+    }
+
+    // Check if user is the invitee OR the zone owner
+    const isInvitee = invitation.inviteeId === session.user.id
+    const isZoneOwner = invitation.zone.userId === session.user.id
+
+    if (!isInvitee && !isZoneOwner) {
+      return { error: "You are not authorized to accept this invitation." }
     }
     
     if (invitation.status !== "PENDING") {
@@ -109,10 +120,21 @@ export async function declineInvitation({ invitationId }: { invitationId: string
     try {
         const invitation = await prisma.zoneInvitation.findUnique({
             where: { id: invitationId },
+            include: {
+                zone: true,
+            },
         })
 
-        if (!invitation || invitation.inviteeId !== session.user.id) {
-            return { error: "Invitation not found or you are not the invitee." }
+        if (!invitation) {
+            return { error: "Invitation not found." }
+        }
+
+        // Check if user is the invitee OR the zone owner
+        const isInvitee = invitation.inviteeId === session.user.id
+        const isZoneOwner = invitation.zone.userId === session.user.id
+
+        if (!isInvitee && !isZoneOwner) {
+            return { error: "You are not authorized to decline this invitation." }
         }
 
         if (invitation.status !== "PENDING") {
