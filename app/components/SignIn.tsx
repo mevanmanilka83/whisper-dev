@@ -57,13 +57,13 @@ export function SignIn() {
   const router = useRouter()
 
   // Show skeleton while loading or if status is loading
-  if (status === "loading") {
+    if (status === "loading") {
     return <SignInSkeleton />
   }
 
   // Redirect if already authenticated
   if (status === "authenticated" && session?.user) {
-    router.push("/")
+      router.push("/")
     return <SignInSkeleton />
   }
 

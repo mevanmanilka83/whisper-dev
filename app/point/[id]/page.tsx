@@ -17,12 +17,12 @@ import CopyLink from "@/app/components/CopyLink"
 async function getPoint(id: string) {
   const point = await prisma.point.findUnique({
     where: { id },
-    select: {
-      title: true,
+  select: {
+    title: true,
       textContent: true,
-      image: true,
-      createdAt: true,
-      updatedAt: true,
+    image: true,
+    createdAt: true,
+    updatedAt: true,
       subName: true,
       zone: {
         select: {
@@ -42,7 +42,7 @@ async function getPoint(id: string) {
           type: true,
         },
       },
-    },
+  },
   })
   return point
 }

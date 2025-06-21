@@ -75,7 +75,7 @@ export async function acceptInvitation({ invitationId }: { invitationId: string 
 
       await tx.zoneMember.create({
         data: {
-          userId: invitation.type === 'INVITATION' ? invitation.inviteeId : invitation.inviterId,
+          userId: invitation.inviteeId,
           zoneId: invitation.zoneId,
           role: "COLLABORATOR",
         },

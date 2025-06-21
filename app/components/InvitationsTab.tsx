@@ -6,7 +6,7 @@ import { acceptInvitation, declineInvitation } from "@/app/actions/settings"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Check, X, Clock, UserPlus, Mail, Inbox } from "lucide-react"
+import { Check, X, Clock, Mail, Inbox } from "lucide-react"
 import { toast } from "sonner"
 import { formatDistanceToNow } from "date-fns"
 
@@ -48,8 +48,8 @@ export default function InvitationsTab() {
     })
   }
 
-  const collaborationInvites = invitations.filter(inv => inv.type === 'INVITATION');
-  const joinRequests = invitations.filter(inv => inv.type === 'JOIN_REQUEST');
+  const collaborationInvites = invitations; // All invitations are collaboration invitations
+  const joinRequests: Invitation[] = []; // No join requests in current schema
 
   if (isLoading) {
     return (
@@ -101,50 +101,6 @@ export default function InvitationsTab() {
                 <Inbox className="h-10 w-10 mx-auto mb-2 text-muted-foreground/50"/>
                 <p>You have no pending collaboration invitations.</p>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-4 flex items-center"><UserPlus className="mr-2 h-5 w-5 text-primary" /> Zone Join Requests</h3>
-        <Card>
-          <CardContent className="p-0">
-            {joinRequests.length > 0 ? (
-               <ul className="divide-y divide-border">
-                {joinRequests.map((request) => (
-                  <li key={request.id} className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center space-x-4">
-                       <Avatar>
-                        <AvatarImage src={request.inviter.image ?? undefined} />
-                        <AvatarFallback>{request.inviter.name?.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">
-                          <span className="font-bold">{request.inviter.name}</span> wants to join <span className="font-bold text-primary">{request.zone.name}</span>.
-                        </p>
-                        <p className="text-sm text-muted-foreground flex items-center mt-1">
-                            <Clock className="h-3 w-3 mr-1.5" />
-                            {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                       <Button size="sm" variant="outline" onClick={() => handleResponse(request.id, 'decline')} disabled={isPending}>
-                        Decline
-                      </Button>
-                      <Button size="sm" onClick={() => handleResponse(request.id, 'accept')} disabled={isPending}>
-                        Approve
-                      </Button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-                <div className="p-8 text-center text-muted-foreground">
-                    <Inbox className="h-10 w-10 mx-auto mb-2 text-muted-foreground/50"/>
-                    <p>No pending requests to join your zones.</p>
-                </div>
             )}
           </CardContent>
         </Card>

@@ -24,7 +24,7 @@ export default async function Home({
           <CreateDropCard />
 
           <Suspense fallback={<SkeltonCard />}>
-            <ClientShowItems page={currentPage} />
+          <ClientShowItems page={currentPage} />
           </Suspense>
         </div>
 
@@ -64,8 +64,8 @@ export default async function Home({
                 </div>
                 <div className="mb-5">
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Whisper is a secure platform for sharing thoughts and engaging in discussions.
-                  </p>
+                  Whisper is a secure platform for sharing thoughts and engaging in discussions.
+                </p>
                 </div>
                 <div className="flex flex-col gap-y-3">
                   <Button

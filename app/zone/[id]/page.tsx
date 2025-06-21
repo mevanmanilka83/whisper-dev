@@ -171,37 +171,37 @@ async function ShowZoneItems({ zoneId, page }: { zoneId: string; page: number })
         </Card>
       ) : (
         <>
-          <div className="space-y-5">
-            {data.map((point) => {
-              let parsedContent = null
-              if (point.textContent) {
-                try {
-                  parsedContent =
-                    typeof point.textContent === "string" ? JSON.parse(point.textContent) : point.textContent
-                } catch (e) {
-                  console.error(`Error parsing content for point ${point.id}:`, e)
-                }
+        <div className="space-y-5">
+          {data.map((point) => {
+            let parsedContent = null
+            if (point.textContent) {
+              try {
+                parsedContent =
+                  typeof point.textContent === "string" ? JSON.parse(point.textContent) : point.textContent
+              } catch (e) {
+                console.error(`Error parsing content for point ${point.id}:`, e)
               }
+            }
 
-              return (
-                <DropCard
-                  key={point.id}
-                  id={point.id}
-                  title={point.title}
-                  jsonContent={parsedContent}
-                  image={point.image}
-                  subName={point.subName}
-                  createdAt={point.createdAt}
-                  boostCount={Math.max(
-                    0,
-                    point.Boost.reduce((acc, boost) => {
-                      return boost.type === "Boost" ? acc + 1 : acc - 1
-                    }, 0),
-                  )}
-                />
-              )
-            })}
-          </div>
+            return (
+              <DropCard
+                key={point.id}
+                id={point.id}
+                title={point.title}
+                jsonContent={parsedContent}
+                image={point.image}
+                subName={point.subName}
+                createdAt={point.createdAt}
+                boostCount={Math.max(
+                  0,
+                  point.Boost.reduce((acc, boost) => {
+                    return boost.type === "Boost" ? acc + 1 : acc - 1
+                  }, 0),
+                )}
+              />
+            )
+          })}
+        </div>
           {data.length > 0 && totalPages > 1 && <PaginationComponent totalPages={totalPages} />}
         </>
       )}

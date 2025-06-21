@@ -32,7 +32,7 @@ export default function Navbar() {
           <div className="w-full flex-1 md:w-auto md:flex-none">{/* You can add a search bar here if needed */}</div>
           <nav className="flex items-center space-x-3 flex-shrink-0">
             <div>
-              <ThemeToggle />
+            <ThemeToggle />
             </div>
             {session?.user ? (
               <div className="flex-shrink-0 w-10 h-10">
@@ -40,15 +40,15 @@ export default function Navbar() {
               </div>
             ) : (
               <div>
-                <Link href="/sign-in">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
-                  >
-                    <span className="relative z-10">Sign In</span>
-                  </Button>
-                </Link>
+              <Link href="/sign-in">
+        <Button
+                  variant="default"
+                  size="sm"
+                  className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                >
+                  <span className="relative z-10">Sign In</span>
+        </Button>
+              </Link>
               </div>
             )}
           </nav>

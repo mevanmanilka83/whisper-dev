@@ -251,136 +251,136 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
 
           {/* Main Content - Only show if user is a member */}
           {isMember ? (
-            <Tabs defaultValue="post" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-muted/60 h-12">
-                <TabsTrigger
-                  value="post"
-                  className="flex items-center justify-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm h-10"
-                >
-                  <Text className="h-4 w-4" />
-                  Text Post
-                </TabsTrigger>
-                <TabsTrigger
-                  value="image"
-                  className="flex items-center justify-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm h-10"
-                >
-                  <FileImage className="h-4 w-4" />
-                  Media Upload
-                </TabsTrigger>
-              </TabsList>
+          <Tabs defaultValue="post" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-muted/60 h-12">
+              <TabsTrigger
+                value="post"
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm h-10"
+              >
+                <Text className="h-4 w-4" />
+                Text Post
+              </TabsTrigger>
+              <TabsTrigger
+                value="image"
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm h-10"
+              >
+                <FileImage className="h-4 w-4" />
+                Media Upload
+              </TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="post" className="m-0">
-                <Card className="border shadow-lg rounded-xl overflow-hidden">
-                  <form action={handleSubmit}>
-                    <input type="hidden" name="imageUrl" value={imageUrl} />
-                    <input type="hidden" name="zoneId" value={resolvedParams.id} />
-                    <input type="hidden" name="subName" value={resolvedParams.id} />
+            <TabsContent value="post" className="m-0">
+              <Card className="border shadow-lg rounded-xl overflow-hidden">
+                <form action={handleSubmit}>
+                  <input type="hidden" name="imageUrl" value={imageUrl} />
+                  <input type="hidden" name="zoneId" value={resolvedParams.id} />
+                  <input type="hidden" name="subName" value={resolvedParams.id} />
 
-                    <CardHeader className="space-y-4 pb-6">
-                      <CardTitle className="text-xl flex items-center gap-2">
-                        <Text className="h-5 w-5 text-primary" />
-                        Create Drop Point
-                      </CardTitle>
-                      <Separator />
-                      <div className="space-y-3">
-                        <Label htmlFor="title" className="text-base font-medium">
-                          Title
-                        </Label>
-                        <Input
-                          id="title"
-                          required
-                          name="title"
-                          className="h-12 text-base focus-visible:ring-2 focus-visible:ring-primary/20"
-                          placeholder="Give your drop a compelling title"
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                        />
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="pb-6">
-                      <div className="space-y-3">
-                        <Label htmlFor="content" className="text-base font-medium">
-                          Content
-                        </Label>
-                        <div className="rounded-lg">
-                          <EditorComponent setJson={setJson} json={json} />
-                        </div>
-                      </div>
-                    </CardContent>
-
-                    <CardFooter className="flex justify-between border-t pt-6 bg-muted/30">
-                      <Button variant="outline" type="button" onClick={() => router.back()} className="h-11 px-6">
-                        Cancel
-                      </Button>
-                      <SubmitButton
-                        text="Create Point"
-                        loadingText="Creating..."
-                        variant="default"
-                        size="lg"
-                        icon={<Text className="h-4 w-4" />}
-                      />
-                    </CardFooter>
-                  </form>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="image" className="m-0">
-                <Card className="border shadow-lg rounded-xl overflow-hidden">
-                  <CardHeader className="pb-6">
+                  <CardHeader className="space-y-4 pb-6">
                     <CardTitle className="text-xl flex items-center gap-2">
-                      <FileImage className="h-5 w-5 text-primary" />
-                      Upload Media
+                      <Text className="h-5 w-5 text-primary" />
+                      Create Drop Point
                     </CardTitle>
                     <Separator />
+                    <div className="space-y-3">
+                      <Label htmlFor="title" className="text-base font-medium">
+                        Title
+                      </Label>
+                      <Input
+                        id="title"
+                        required
+                        name="title"
+                        className="h-12 text-base focus-visible:ring-2 focus-visible:ring-primary/20"
+                        placeholder="Give your drop a compelling title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                      />
+                    </div>
                   </CardHeader>
 
-                  <CardContent className="pb-8">
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="w-full max-w-lg">
-                        <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-xl flex flex-col items-center justify-center bg-muted/20 hover:bg-muted/30 transition-colors">
-                          {imageUrl ? (
-                            <div className="flex flex-col items-center gap-4">
-                              <Image
-                                src={imageUrl || "/placeholder.svg"}
-                                alt="Uploaded Image"
-                                className="object-cover rounded-lg shadow-md"
-                                width={300}
-                                height={200}
-                              />
-                              <Button type="button" variant="destructive" size="sm" onClick={() => setImageUrl("")}>
-                                Remove Image
-                              </Button>
-                            </div>
-                          ) : (
-                            <div className="text-center space-y-4">
-                              <FileImage className="h-12 w-12 text-muted-foreground mx-auto" />
-                              <div className="space-y-2">
-                                <p className="text-sm font-medium">Upload your media</p>
-                                <p className="text-xs text-muted-foreground">Drag and drop or click to browse</p>
-                              </div>
-                              <UploadButton
-                                endpoint="imageUploader"
-                                onClientUploadComplete={(res) => {
-                                  console.log(res)
-                                  setImageUrl(res[0].url)
-                                }}
-                                onUploadError={(error: Error) => {
-                                  toast.error("Upload Failed", {
-                                    description: error.message,
-                                    position: "bottom-right",
-                                  })
-                                }}
-                              />
-                            </div>
-                          )}
-                        </div>
+                  <CardContent className="pb-6">
+                    <div className="space-y-3">
+                      <Label htmlFor="content" className="text-base font-medium">
+                        Content
+                      </Label>
+                      <div className="rounded-lg">
+                        <EditorComponent setJson={setJson} json={json} />
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+
+                  <CardFooter className="flex justify-between border-t pt-6 bg-muted/30">
+                    <Button variant="outline" type="button" onClick={() => router.back()} className="h-11 px-6">
+                      Cancel
+                    </Button>
+                    <SubmitButton
+                      text="Create Point"
+                      loadingText="Creating..."
+                      variant="default"
+                      size="lg"
+                      icon={<Text className="h-4 w-4" />}
+                    />
+                  </CardFooter>
+                </form>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="image" className="m-0">
+              <Card className="border shadow-lg rounded-xl overflow-hidden">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <FileImage className="h-5 w-5 text-primary" />
+                    Upload Media
+                  </CardTitle>
+                  <Separator />
+                </CardHeader>
+
+                <CardContent className="pb-8">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="w-full max-w-lg">
+                      <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-xl flex flex-col items-center justify-center bg-muted/20 hover:bg-muted/30 transition-colors">
+                        {imageUrl ? (
+                          <div className="flex flex-col items-center gap-4">
+                            <Image
+                              src={imageUrl || "/placeholder.svg"}
+                              alt="Uploaded Image"
+                              className="object-cover rounded-lg shadow-md"
+                              width={300}
+                              height={200}
+                            />
+                            <Button type="button" variant="destructive" size="sm" onClick={() => setImageUrl("")}>
+                              Remove Image
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="text-center space-y-4">
+                            <FileImage className="h-12 w-12 text-muted-foreground mx-auto" />
+                            <div className="space-y-2">
+                              <p className="text-sm font-medium">Upload your media</p>
+                              <p className="text-xs text-muted-foreground">Drag and drop or click to browse</p>
+                            </div>
+                            <UploadButton
+                              endpoint="imageUploader"
+                              onClientUploadComplete={(res) => {
+                                console.log(res)
+                                setImageUrl(res[0].url)
+                              }}
+                              onUploadError={(error: Error) => {
+                                toast.error("Upload Failed", {
+                                  description: error.message,
+                                  position: "bottom-right",
+                                })
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
           ) : (
             <Card className="border shadow-lg rounded-xl overflow-hidden">
               <CardContent className="p-8 text-center">

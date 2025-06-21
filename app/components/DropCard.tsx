@@ -77,7 +77,7 @@ export default function DropCard({
               asChild
             >
               <Link href={`/zone/${subName}`}>
-                zone/{subName}
+              zone/{subName}
               </Link>
             </Badge>
           )}

@@ -12,8 +12,6 @@ import { Separator } from "@/components/ui/separator"
 import { 
   UserPlus, 
   Clock, 
-  Check, 
-  X, 
   Users,
   Send
 } from "lucide-react"
@@ -107,6 +105,7 @@ export default function ZoneInvitations({ zoneName, isOwner }: ZoneInvitationsPr
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleInvitationResponse = async (invitationId: string, action: "accept" | "decline") => {
     try {
       const response = await fetch(`/api/invitations/${invitationId}`, {
@@ -192,10 +191,10 @@ export default function ZoneInvitations({ zoneName, isOwner }: ZoneInvitationsPr
 
         <Separator />
 
-        {/* Pending Invitations */}
+        {/* Sent Invitations */}
         <div className="space-y-3">
           <h3 className="text-sm font-medium text-muted-foreground">
-            Pending Invitations ({invitations.length})
+            Sent Invitations ({invitations.length})
           </h3>
           
           {loading ? (
@@ -205,7 +204,7 @@ export default function ZoneInvitations({ zoneName, isOwner }: ZoneInvitationsPr
           ) : invitations.length === 0 ? (
             <div className="text-center py-6 text-muted-foreground">
               <UserPlus className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No pending invitations</p>
+              <p className="text-sm">No sent invitations</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -241,24 +240,6 @@ export default function ZoneInvitations({ zoneName, isOwner }: ZoneInvitationsPr
                       <Clock className="h-3 w-3 mr-1" />
                       Pending
                     </Badge>
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleInvitationResponse(invitation.id, "accept")}
-                        className="h-7 px-2"
-                      >
-                        <Check className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleInvitationResponse(invitation.id, "decline")}
-                        className="h-7 px-2"
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
                   </div>
                 </div>
               ))}

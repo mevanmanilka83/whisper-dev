@@ -30,10 +30,11 @@ export async function GET(
       return NextResponse.json({ error: "Only zone owners can view invitations" }, { status: 403 })
     }
 
-    // Get pending invitations for this zone
+    // Get pending invitations SENT by this zone owner
     const invitations = await prisma.zoneInvitation.findMany({
       where: {
         zoneId: zone.id,
+        inviterId: session.user.id, // Only show invitations sent by the current user
         status: "PENDING",
       },
       include: {
