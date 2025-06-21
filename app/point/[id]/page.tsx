@@ -26,6 +26,7 @@ async function getPoint(id: string) {
       subName: true,
       zone: {
         select: {
+          id: true,
           name: true,
           createdAt: true,
           description: true,

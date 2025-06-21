@@ -14,8 +14,8 @@ export async function GET(
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
     }
 
-    // Find the zone by name
-    const zone = await prisma.zone.findUnique({
+    // First try to find the zone by name (for URL-friendly routing)
+    let zone = await prisma.zone.findFirst({
       where: { name: id },
       select: {
         id: true,
@@ -25,6 +25,21 @@ export async function GET(
         userId: true,
       },
     })
+
+    // Fallback: if no zone found by name, try by ID (for backward compatibility)
+    // Only try this if the id looks like a valid MongoDB ObjectID (24 hex characters)
+    if (!zone && /^[0-9a-fA-F]{24}$/.test(id)) {
+      zone = await prisma.zone.findUnique({
+        where: { id: id },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          userId: true,
+        },
+      })
+    }
 
     if (!zone) {
       return NextResponse.json({ error: "Zone not found" }, { status: 404 })

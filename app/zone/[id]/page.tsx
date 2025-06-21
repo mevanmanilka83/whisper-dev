@@ -19,30 +19,10 @@ import ZoneInvitations from "@/app/components/ZoneInvitations"
 
 const ITEMS_PER_PAGE = 2
 
-async function getZoneData(id: string, userId?: string) {
+async function getZoneData(id: string) {
   try {
-    if (userId) {
-      const userZone = await prisma.zone.findFirst({
-        where: {
-          name: id,
-          userId: userId,
-        },
-        select: {
-          name: true,
-          createdAt: true,
-          description: true,
-          id: true,
-          userId: true,
-        },
-      })
-
-      if (userZone) {
-        return userZone
-      }
-    }
-
-    // If no user-specific zone found, look for any zone with this name
-    const publicZone = await prisma.zone.findFirst({
+    // First try to find zone by name (for URL-friendly routing)
+    let zone = await prisma.zone.findFirst({
       where: {
         name: id,
       },
@@ -55,7 +35,32 @@ async function getZoneData(id: string, userId?: string) {
       },
     })
 
-    return publicZone
+    if (zone) {
+      return zone
+    }
+
+    // If no zone found by name, try by ID (for backward compatibility with existing links)
+    // Only try this if the id looks like a valid MongoDB ObjectID (24 hex characters)
+    if (/^[0-9a-fA-F]{24}$/.test(id)) {
+      zone = await prisma.zone.findUnique({
+        where: {
+          id: id,
+        },
+        select: {
+          name: true,
+          createdAt: true,
+          description: true,
+          id: true,
+          userId: true,
+        },
+      })
+
+      if (zone) {
+        return zone
+      }
+    }
+
+    return null
   } catch (error) {
     console.error("Error fetching zone:", error)
     return null
@@ -223,7 +228,7 @@ export default async function ZonePage({
   const session = await auth()
 
   // Pass the user ID to getZoneData if available
-  const zoneData = await getZoneData(id, session?.user?.id)
+  const zoneData = await getZoneData(id)
 
   if (!zoneData) {
     return redirect("/zone/setup")

@@ -91,13 +91,13 @@ export default function Page() {
                   id="name"
                   name="name"
                   className="h-12 text-base focus-visible:ring-2 focus-visible:ring-primary/20"
-                  placeholder="Enter zone name"
+                  placeholder="e.g., my-zone, dev_zone, project123"
                   minLength={2}
                   maxLength={21}
                   required
                 />
                 <p className="text-sm text-muted-foreground">
-                  Choose a name between 2-21 characters. This will be your zone&apos;s unique identifier.
+                  Choose a name between 2-21 characters. Use letters, numbers, hyphens, or underscores. No spaces allowed.
                 </p>
                 {state.message && state.error && (
                   <p className="text-sm text-destructive font-medium">{state.message}</p>

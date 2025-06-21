@@ -27,6 +27,21 @@ export async function createZone(prevState: ActionState, formData: FormData) {
       throw new Error("Zone name is required.");
     }
 
+    // Validate zone name format
+    if (name.includes(" ")) {
+      return {
+        message: "Zone name cannot contain spaces. Use hyphens or underscores instead.",
+        error: true,
+      };
+    }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+      return {
+        message: "Zone name can only contain letters, numbers, hyphens, and underscores.",
+        error: true,
+      };
+    }
+
     if (!session.user.id) {
       throw new Error("User ID is required.");
     }
@@ -41,7 +56,7 @@ export async function createZone(prevState: ActionState, formData: FormData) {
     return {
       message: "Zone created successfully!",
       error: false,
-      zoneId: zone.name,
+      zoneId: zone.name, // Return the zone name for URL-friendly routing
     };
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
