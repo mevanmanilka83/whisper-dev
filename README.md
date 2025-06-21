@@ -1,13 +1,12 @@
 # Whisper
 
-<p align="left">
-  <img src="https://img.shields.io/badge/Next.js-15-black?logo=nextdotjs" alt="Next.js 15" />
-  <img src="https://img.shields.io/badge/TailwindCSS-4.5-38bdf8?logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4.5" />
-  <img src="https://img.shields.io/badge/Prisma-ORM-2d3748?logo=prisma" alt="Prisma ORM" />
-  <img src="https://img.shields.io/badge/MongoDB-6.0-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
-  <img src="https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Auth.js-Auth-2e2e2e?logo=auth0&logoColor=white" alt="Auth.js" />
-</p>
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-purple?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2d3748?style=for-the-badge&logo=prisma)](https://www.prisma.io)
+[![MongoDB](https://img.shields.io/badge/MongoDB-6.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com)
+[![Auth.js](https://img.shields.io/badge/Auth.js-Auth-2e2e2e?style=for-the-badge&logo=auth0&logoColor=white)](https://authjs.dev)
 
 ## Overview
 
