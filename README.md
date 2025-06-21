@@ -11,6 +11,19 @@
 
 ## Overview
 
-Whisper is a modern web application for creating and managing zones where users can share thoughts, media, and engage in discussions. Each zone has its own description and set of rules. Users can create drops with rich text formatting, and the platform supports uploading images and videos. Real-time toast notifications keep users informed of their actions and provide feedback within the application.
+Whisper is a modern collaborative platform where users can create and manage zones to share thoughts, media, and engage in discussions. Think of it as a social platform organized around themed spaces called "zones" - each zone has its own community, content, and rules.
 
-The application is responsive, working seamlessly on all devices, and supports both dark and light themes to cater to user preferences. Authentication is handled securely with Auth.js (NextAuth.js), and all data is managed in a MongoDB database using Prisma ORM.
+### What is Whisper?
+
+**Zones**: Users can create zones (like subreddits or Discord channels) around any topic or interest. Each zone has a name, description, and can be customized by its owner.
+
+**Drops**: Within zones, users create "drops" - posts that can contain rich text, images, and videos. Drops support advanced formatting and media uploads.
+
+**Collaboration**: Zone owners can invite others to collaborate, and users can request to join zones. The platform includes a complete invitation and membership management system.
+
+**Real-time Features**: Users get notifications for invitations, join requests, and other activities. The interface provides real-time feedback with toast notifications and live counters.
+
+**Modern Tech Stack**: Built with Next.js 15, TypeScript, Tailwind CSS, and MongoDB. Features Google OAuth authentication, responsive design, and dark/light theme support.
+
+Whisper combines the best aspects of social platforms, content management systems, and collaboration tools into a single, intuitive application.
+
