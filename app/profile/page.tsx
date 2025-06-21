@@ -246,7 +246,7 @@ export default function ProfilePage() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Profile Header */}
-          <Card className="overflow-hidden border shadow-sm hover:shadow-lg transition-all duration-300 rounded-xl">
+          <Card className="border shadow-sm hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden p-0">
             <div className="relative h-48 bg-gradient-to-br from-primary/20 to-primary/5">
               <div className="absolute bottom-4 left-6">
                 <div className="flex items-end space-x-4">
