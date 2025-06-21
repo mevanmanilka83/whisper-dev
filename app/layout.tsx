@@ -46,10 +46,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       © {new Date().getFullYear()} Whisper. All rights reserved.
                     </p>
                     <div className="flex items-center space-x-4">
-                      <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                         Privacy
                       </a>
-                      <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      <a href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                         Terms
                       </a>
                       <a
