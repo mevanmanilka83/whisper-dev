@@ -1,13 +1,11 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import DropCard from "./DropCard"
 import { useEffect, useState } from "react"
 import SkeltonCard from "./SkeltonCard"
 import Pagination from "./Pagination"
-import { PlusCircle, MessageSquare } from "lucide-react"
+import { MessageSquare } from "lucide-react"
 
 interface Post {
   id: string
@@ -61,12 +59,6 @@ export default function ClientShowItems({ page }: { page: number }) {
           <div className="flex flex-col items-center justify-center space-y-3">
             <MessageSquare className="h-12 w-12 text-muted-foreground/50" />
             <p className="text-muted-foreground font-medium">No drops yet. Be the first to create one!</p>
-            <Button asChild variant="outline" className="mt-2">
-              <Link href="/zone/setup">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Create Drop
-              </Link>
-            </Button>
           </div>
         </Card>
       ) : (
