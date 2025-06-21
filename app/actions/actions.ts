@@ -497,6 +497,11 @@ export async function requestToJoinZone(formData: FormData): Promise<{ error?: s
       throw new Error(`Zone with name ${zoneName} not found.`);
     }
 
+    // Check if user is the zone owner
+    if (zone.userId === session.user.id) {
+      throw new Error("You cannot request to join your own zone.");
+    }
+
     // Check if user is already a member
     const existingMembership = await prisma.zoneMember.findUnique({
       where: {
@@ -521,20 +526,38 @@ export async function requestToJoinZone(formData: FormData): Promise<{ error?: s
       },
     });
 
-    if (existingInvitation && existingInvitation.status === "PENDING") {
-      throw new Error("You already have a pending request for this zone.");
+    if (existingInvitation) {
+      if (existingInvitation.status === "PENDING") {
+        throw new Error("You already have a pending join request for this zone. Check your settings page to view or cancel it.");
+      }
+      
+      // If there's an existing invitation with a different status, update it
+      await prisma.zoneInvitation.update({
+        where: {
+          zoneId_inviteeId: {
+            zoneId: zone.id,
+            inviteeId: session.user.id,
+          },
+        },
+        data: {
+          inviterId: session.user.id,
+          status: "PENDING",
+          message: message || null,
+          updatedAt: new Date(),
+        },
+      });
+    } else {
+      // Create a new join request. The user is both the inviter and invitee,
+      // which signifies a request about themselves for the zone owner to review.
+      await prisma.zoneInvitation.create({
+        data: {
+          zoneId: zone.id,
+          inviterId: session.user.id,
+          inviteeId: session.user.id,
+          message: message || null,
+        },
+      });
     }
-
-    // Create a join request. The user is both the inviter and invitee,
-    // which signifies a request about themselves for the zone owner to review.
-    await prisma.zoneInvitation.create({
-      data: {
-        zoneId: zone.id,
-        inviterId: session.user.id,
-        inviteeId: session.user.id,
-        message: message || null,
-      },
-    });
 
     return {
       success: true,

@@ -271,15 +271,49 @@ export async function getNotificationStatus() {
     return { count: 0 }
   }
 
-  const invitationCount = await prisma.zoneInvitation.count({
+  // Get zones owned by the current user
+  const ownedZones = await prisma.zone.findMany({
     where: {
-      inviteeId: session.user.id,
-      status: "PENDING",
+      userId: session.user.id,
+    },
+    select: {
+      id: true,
     },
   })
 
+  const [invitationCount, zoneOwnerRequestCount] = await Promise.all([
+    // Count only collaboration invitations where user is the invitee (not their own join requests)
+    prisma.zoneInvitation.count({
+      where: {
+        inviteeId: session.user.id,
+        status: "PENDING",
+        // Exclude join requests where user is both inviter and invitee
+        NOT: {
+          inviterId: session.user.id,
+        },
+      },
+    }),
+    // Count join requests for zones owned by the user
+    ownedZones.length > 0 ? (async () => {
+      const joinRequests = await prisma.zoneInvitation.findMany({
+        where: {
+          zoneId: {
+            in: ownedZones.map(zone => zone.id),
+          },
+          status: "PENDING",
+        },
+        select: {
+          inviterId: true,
+          inviteeId: true,
+        },
+      })
+      // Filter for join requests where inviterId equals inviteeId
+      return joinRequests.filter(request => request.inviterId === request.inviteeId).length
+    })() : Promise.resolve(0),
+  ])
+
   return {
-    count: invitationCount,
+    count: invitationCount + zoneOwnerRequestCount,
   }
 }
 
@@ -291,8 +325,19 @@ export async function getPendingInvitations() {
 
   const invitations = await prisma.zoneInvitation.findMany({
     where: {
-      inviteeId: session.user.id,
-      status: "PENDING",
+      OR: [
+        // Collaboration invitations where user is the invitee
+        {
+          inviteeId: session.user.id,
+          status: "PENDING",
+        },
+        // Join requests where user is both inviter and invitee
+        {
+          inviterId: session.user.id,
+          inviteeId: session.user.id,
+          status: "PENDING",
+        },
+      ],
     },
     include: {
       zone: {
@@ -312,5 +357,139 @@ export async function getPendingInvitations() {
     },
   })
 
+  console.log("getPendingInvitations - session user ID:", session.user.id)
+  console.log("getPendingInvitations - raw invitations:", invitations)
+
   return { invitations }
+}
+
+export async function getZoneOwnerJoinRequests() {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return { joinRequests: [] }
+  }
+
+  // Get zones owned by the current user
+  const ownedZones = await prisma.zone.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  })
+
+  if (ownedZones.length === 0) {
+    return { joinRequests: [] }
+  }
+
+  // Get join requests for zones owned by the current user
+  const joinRequests = await prisma.zoneInvitation.findMany({
+    where: {
+      zoneId: {
+        in: ownedZones.map(zone => zone.id),
+      },
+      // Join requests where inviter and invitee are the same (self-request)
+      // Use raw SQL condition since Prisma doesn't support field-to-field comparison easily
+      AND: [
+        { status: "PENDING" },
+        // This will be handled by filtering in JavaScript
+      ],
+    },
+    include: {
+      zone: {
+        select: {
+          name: true,
+        },
+      },
+      inviter: {
+        select: {
+          name: true,
+          image: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  })
+
+  // Filter for join requests where inviterId equals inviteeId
+  const filteredJoinRequests = joinRequests.filter(request => request.inviterId === request.inviteeId)
+
+  console.log("getZoneOwnerJoinRequests - session user ID:", session.user.id)
+  console.log("getZoneOwnerJoinRequests - owned zones:", ownedZones)
+  console.log("getZoneOwnerJoinRequests - raw join requests:", joinRequests)
+  console.log("getZoneOwnerJoinRequests - filtered join requests:", filteredJoinRequests)
+
+  return { joinRequests: filteredJoinRequests }
+} 
+
+export async function getUserZoneMemberships() {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return { memberships: [] }
+  }
+
+  const memberships = await prisma.zoneMember.findMany({
+    where: {
+      userId: session.user.id,
+      role: "COLLABORATOR",
+    },
+    include: {
+      zone: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          user: {
+            select: {
+              name: true,
+              image: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      zone: {
+        createdAt: "desc",
+      },
+    },
+  })
+
+  return { memberships }
+} 
+
+export async function getUserOwnedZones() {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return { zones: [] }
+  }
+
+  const zones = await prisma.zone.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      createdAt: true,
+      _count: {
+        select: {
+          points: true,
+          members: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  })
+
+  return { zones }
 } 
