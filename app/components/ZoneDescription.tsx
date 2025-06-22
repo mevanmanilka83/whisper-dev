@@ -1,14 +1,13 @@
 "use client";
 import { Textarea } from "@/components/ui/textarea";
 import type React from "react";
-
 import { toast } from "sonner";
 import { SaveButton } from "./SubmitButton";
 
 interface ZoneDescriptionProps {
   zoneId: string;
   description: string;
-  updateDescription: (formData: FormData) => Promise<any>;
+  updateDescription: (formData: FormData) => Promise<{ error?: string; success?: boolean; message?: string }>;
 }
 
 export function ZoneDescriptionpage({

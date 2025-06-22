@@ -362,7 +362,6 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
                             <UploadButton
                               endpoint="imageUploader"
                               onClientUploadComplete={(res) => {
-                                console.log(res)
                                 setImageUrl(res[0].url)
                               }}
                               onUploadError={(error: Error) => {

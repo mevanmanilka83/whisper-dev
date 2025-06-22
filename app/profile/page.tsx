@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -79,9 +79,73 @@ export default function ProfilePage() {
         avatar: session.user?.image || "/whisper.jpg"
       }))
     }
-  }, [session])
+  }, [session?.user])
 
   // Fetch user stats and activity
+  const fetchData = useCallback(async (userId: string) => {
+    try {
+      const [profileData, statsData, activityData, zonesData] = await Promise.all([
+        getUserProfile(userId),
+        getUserStats(userId),
+        getUserActivity(userId),
+        getUserZones(userId)
+      ])
+      
+      // Update profile data with complete user info
+      if (profileData) {
+        setProfileData(prev => ({
+          ...prev,
+          name: profileData.name || "",
+          email: profileData.email || "",
+          avatar: profileData.image || "/whisper.jpg",
+          bio: profileData.bio || "",
+          location: profileData.location || "",
+          website: profileData.website || ""
+        }))
+        // Set profileId from the profile data
+        setProfileId(profileData.profileId || null)
+      }
+      
+      // Ensure stats data is valid
+      const validStats = {
+        points: typeof statsData?.points === 'number' ? statsData.points : 0,
+        zones: typeof statsData?.zones === 'number' ? statsData.zones : 0,
+        boosts: typeof statsData?.boosts === 'number' ? statsData.boosts : 0,
+        comments: typeof statsData?.comments === 'number' ? statsData.comments : 0
+      }
+      
+      setStats(validStats)
+      
+      // Combine points and zones into activity
+      const combinedActivity = [
+        ...(activityData || []),
+        ...(zonesData || []).map(zone => ({
+          id: zone.id,
+          type: "zone",
+          title: zone.name,
+          zoneName: zone.name,
+          createdAt: zone.createdAt,
+          description: zone.description || undefined
+        }))
+      ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 10) // Keep only the 10 most recent items
+      
+      setActivity(combinedActivity)
+      setUserZones(zonesData || [])
+      
+    } catch (error) {
+      console.error("Error fetching user data:", error)
+      setStats({
+        points: 0,
+        zones: 0,
+        boosts: 0,
+        comments: 0
+      })
+      setActivity([])
+      setUserZones([])
+    }
+  }, [])
+
   useEffect(() => {
     if (status === "loading") {
       return
@@ -93,78 +157,9 @@ export default function ProfilePage() {
     }
     
     if (session?.user?.id) {
-      const userId = session.user.id
-      console.log("Session user:", session.user)
-      console.log("Using userId:", userId)
-      
-      const fetchData = async () => {
-        try {
-          const [profileData, statsData, activityData, zonesData] = await Promise.all([
-            getUserProfile(userId),
-            getUserStats(userId),
-            getUserActivity(userId),
-            getUserZones(userId)
-          ])
-          
-          // Update profile data with complete user info
-          if (profileData) {
-            setProfileData(prev => ({
-              ...prev,
-              name: profileData.name || "",
-              email: profileData.email || "",
-              avatar: profileData.image || "/whisper.jpg",
-              bio: profileData.bio || "",
-              location: profileData.location || "",
-              website: profileData.website || ""
-            }))
-            // Set profileId from the profile data
-            console.log("Setting profileId:", profileData.profileId)
-            setProfileId(profileData.profileId || null)
-          }
-          
-          // Ensure stats data is valid
-          const validStats = {
-            points: typeof statsData?.points === 'number' ? statsData.points : 0,
-            zones: typeof statsData?.zones === 'number' ? statsData.zones : 0,
-            boosts: typeof statsData?.boosts === 'number' ? statsData.boosts : 0,
-            comments: typeof statsData?.comments === 'number' ? statsData.comments : 0
-          }
-          
-          setStats(validStats)
-          
-          // Combine points and zones into activity
-          const combinedActivity = [
-            ...(activityData || []),
-            ...(zonesData || []).map(zone => ({
-              id: zone.id,
-              type: "zone",
-              title: zone.name,
-              zoneName: zone.name,
-              createdAt: zone.createdAt,
-              description: zone.description || undefined
-            }))
-          ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-          .slice(0, 10) // Keep only the 10 most recent items
-          
-          setActivity(combinedActivity)
-          setUserZones(zonesData || [])
-          
-        } catch (error) {
-          console.error("Error fetching user data:", error)
-          setStats({
-            points: 0,
-            zones: 0,
-            boosts: 0,
-            comments: 0
-          })
-          setActivity([])
-          setUserZones([])
-        }
-      }
-      
-      fetchData()
+      fetchData(session.user.id)
     }
-  }, [session?.user?.id, status, router])
+  }, [session?.user?.id, status, router, fetchData])
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -200,13 +195,12 @@ export default function ProfilePage() {
     const file = e.target.files?.[0]
     if (file) {
       // Handle avatar upload logic here
-      console.log("Avatar file selected:", file.name)
+      // TODO: Implement avatar upload functionality
     }
   }
 
   const handleShareProfile = async () => {
     try {
-      console.log("Share button clicked, profileId:", profileId)
       if (!profileId) {
         toast.error("Profile ID not available yet. Please try again in a moment.", {
           position: "bottom-right",
@@ -216,7 +210,6 @@ export default function ProfilePage() {
       
       const baseUrl = window.location.origin
       const shareUrl = `${baseUrl}/profile/${profileId}`
-      console.log("Sharing URL:", shareUrl)
       await navigator.clipboard.writeText(shareUrl)
       toast.success("Profile link copied to clipboard!", {
         position: "bottom-right",

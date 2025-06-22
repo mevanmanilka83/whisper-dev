@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, Clock } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
@@ -24,7 +24,7 @@ export default function CommentList({ pointId, refreshTrigger }: CommentListProp
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const response = await fetch(`/api/comments?pointId=${pointId}`)
       if (response.ok) {
@@ -36,11 +36,11 @@ export default function CommentList({ pointId, refreshTrigger }: CommentListProp
     } finally {
       setLoading(false)
     }
-  }
+  }, [pointId])
 
   useEffect(() => {
     fetchComments()
-  }, [pointId, refreshTrigger])
+  }, [fetchComments, refreshTrigger])
 
   // Listen for custom event to refresh comments
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function CommentList({ pointId, refreshTrigger }: CommentListProp
 
     window.addEventListener('commentAdded', handleCommentAdded)
     return () => window.removeEventListener('commentAdded', handleCommentAdded)
-  }, [])
+  }, [fetchComments])
 
   if (loading) {
     return (
