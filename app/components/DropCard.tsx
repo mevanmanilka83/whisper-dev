@@ -9,10 +9,13 @@ import { formatDistanceToNow } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { useState } from "react"
 
 import { handleBoost } from "../actions/actions"
 import Render from "./Render"
 import SkeltonCard from "./SkeltonCard"
+import CommentForm from "./CommentForm"
+import CommentList from "./CommentList"
 
 interface DropCardProps {
   title: string
@@ -22,6 +25,7 @@ interface DropCardProps {
   image: string | null
   subName: string | null
   boostCount: number
+  commentCount?: number
   userName?: string | null
   userImage?: string | null
 }
@@ -34,9 +38,13 @@ export default function DropCard({
   image, 
   subName, 
   boostCount,
+  commentCount = 0,
   userName,
   userImage
 }: DropCardProps) {
+  const [showComments, setShowComments] = useState(false)
+  const [refreshComments, setRefreshComments] = useState(0)
+
   // Show skeleton if required data is missing
   if (!title || !jsonContent) {
     return <SkeltonCard />
@@ -46,6 +54,10 @@ export default function DropCard({
 
   // Ensure jsonContent is properly parsed if it's a string
   const parsedContent = typeof jsonContent === "string" && jsonContent ? JSON.parse(jsonContent) : jsonContent
+
+  const handleCommentAdded = () => {
+    setRefreshComments(prev => prev + 1)
+  }
 
   return (
     <Card className="overflow-hidden border shadow-sm hover:shadow-lg transition-all duration-300 rounded-xl bg-background/80 backdrop-blur-sm group">
@@ -152,15 +164,24 @@ export default function DropCard({
               variant="ghost"
               size="sm"
               className="h-8 px-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 rounded-lg"
-              asChild
+              onClick={() => setShowComments(!showComments)}
             >
-              <Link href={`/point/${id}#comments`}>
-                <MessageSquare className="w-4 h-4 mr-2" />
-                <span className="text-sm">40 comments</span>
-              </Link>
+              <MessageSquare className="w-4 h-4 mr-2" />
+              <span className="text-sm">{commentCount} comment{commentCount !== 1 ? 's' : ''}</span>
             </Button>
           </div>
         </div>
+
+        {/* Comments Section */}
+        {showComments && (
+          <>
+            <Separator className="my-4" />
+            <div className="space-y-4">
+              <CommentForm pointId={id} onCommentAdded={handleCommentAdded} />
+              <CommentList pointId={id} refreshTrigger={refreshComments} />
+            </div>
+          </>
+        )}
       </div>
     </Card>
   )

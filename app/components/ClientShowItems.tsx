@@ -15,6 +15,7 @@ interface Post {
   subName: string
   createdAt: string
   boostCount: number
+  commentCount?: number
   user?: {
     name?: string
     image?: string
@@ -33,7 +34,28 @@ export default function ClientShowItems({ page }: { page: number }) {
         const response = await fetch(`/api/zones/posts?page=${page}`)
         const result = await response.json()
 
-        setData(result.data || [])
+        const posts = result.data || []
+        
+        // Fetch comment counts for all posts
+        if (posts.length > 0) {
+          const pointIds = posts.map((post: Post) => post.id)
+          const commentCountsResponse = await fetch('/api/comments/counts', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ pointIds }),
+          })
+          
+          if (commentCountsResponse.ok) {
+            const commentCounts = await commentCountsResponse.json()
+            posts.forEach((post: Post) => {
+              post.commentCount = commentCounts[post.id] || 0
+            })
+          }
+        }
+
+        setData(posts)
         setCount(result.count || 0)
       } catch (error) {
         console.error("Error fetching data:", error)
@@ -85,6 +107,7 @@ export default function ClientShowItems({ page }: { page: number }) {
                   subName={post.subName}
                   createdAt={post.createdAt}
                   boostCount={post.boostCount}
+                  commentCount={post.commentCount || 0}
                   userName={post.user?.name}
                   userImage={post.user?.image}
                 />

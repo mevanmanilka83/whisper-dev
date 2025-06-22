@@ -696,57 +696,118 @@ export async function leaveZone(formData: FormData): Promise<{ error?: string; s
   const session = await auth();
 
   if (!session?.user?.id) {
-    return redirect("/api/auth/signin");
+    return { error: "Not authenticated" };
   }
 
   try {
-    const zoneName = formData.get("zoneName")?.toString().trim();
+    const zoneId = formData.get("zoneId")?.toString().trim();
 
-    if (!zoneName) {
-      throw new Error("Zone name is required.");
+    if (!zoneId) {
+      return { error: "Zone ID is required" };
     }
 
-    const zone = await prisma.zone.findUnique({
-      where: { name: zoneName },
-    });
-
-    if (!zone) {
-      throw new Error(`Zone with name ${zoneName} not found.`);
-    }
-
-    // Check if user is the zone owner
-    if (zone.userId === session.user.id) {
-      return { error: "Zone owners cannot leave their own zone." };
-    }
-
-    // Check if user is a member
-    const membership = await prisma.zoneMember.findUnique({
+    await prisma.zoneMember.delete({
       where: {
         userId_zoneId: {
           userId: session.user.id,
-          zoneId: zone.id,
+          zoneId: zoneId,
         },
       },
     });
 
-    if (!membership) {
-      return { error: "You are not a member of this zone." };
+    revalidatePath(`/zone/${zoneId}`);
+    return { success: true, message: "Successfully left the zone" };
+  } catch (error) {
+    console.error("Error leaving zone:", error);
+    return { error: "Failed to leave zone" };
+  }
+}
+
+export async function createComment(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
+  console.log("createComment: Action called")
+  
+  const session = await auth();
+  console.log("createComment: Session:", session)
+
+  if (!session?.user?.id) {
+    console.log("createComment: Not authenticated")
+    return { error: "Not authenticated" };
+  }
+
+  try {
+    const content = formData.get("content")?.toString().trim();
+    const pointId = formData.get("pointId")?.toString().trim();
+    
+    console.log("createComment: Content:", content, "PointId:", pointId)
+
+    if (!content || !pointId) {
+      console.log("createComment: Missing content or pointId")
+      return { error: "Content and point ID are required" };
     }
 
-    // Remove membership
-    await prisma.zoneMember.delete({
+    if (content.length === 0) {
+      console.log("createComment: Empty content")
+      return { error: "Comment cannot be empty" };
+    }
+
+    // Verify the point exists
+    const point = await prisma.point.findUnique({
+      where: { id: pointId },
+    });
+    
+    console.log("createComment: Point found:", !!point)
+
+    if (!point) {
+      console.log("createComment: Point not found")
+      return { error: "Point not found" };
+    }
+
+    console.log("createComment: Creating comment in database")
+    const comment = await prisma.comment.create({
+      data: {
+        content: content,
+        userId: session.user.id,
+        pointId: pointId,
+      },
+    });
+    
+    console.log("createComment: Comment created successfully:", comment.id)
+
+    revalidatePath(`/point/${pointId}`);
+    return { success: true, message: "Comment added successfully" };
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    return { error: "Failed to create comment" };
+  }
+}
+
+export async function getCommentCounts(pointIds: string[]): Promise<Record<string, number>> {
+  try {
+    const commentCounts = await prisma.comment.groupBy({
+      by: ['pointId'],
       where: {
-        id: membership.id,
+        pointId: {
+          in: pointIds,
+        },
+      },
+      _count: {
+        pointId: true,
       },
     });
 
-    return {
-      success: true,
-      message: `Successfully left ${zoneName}.`,
-    };
-  } catch (e) {
-    console.error("Error leaving zone:", e);
-    return { error: e instanceof Error ? e.message : "Failed to leave zone" };
+    const countMap: Record<string, number> = {};
+    pointIds.forEach(id => {
+      countMap[id] = 0;
+    });
+
+    commentCounts.forEach(count => {
+      countMap[count.pointId] = count._count.pointId;
+    });
+
+    return countMap;
+  } catch (error) {
+    console.error("Error getting comment counts:", error);
+    return {};
   }
 }
 

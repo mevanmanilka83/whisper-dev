@@ -12,16 +12,18 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
+import CommentForm from "@/app/components/CommentForm"
+import CommentList from "@/app/components/CommentList"
 
 async function getPoint(id: string) {
   const point = await prisma.point.findUnique({
     where: { id },
-  select: {
-    title: true,
+    select: {
+      title: true,
       textContent: true,
-    image: true,
-    createdAt: true,
-    updatedAt: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
       subName: true,
       zone: {
         select: {
@@ -42,7 +44,12 @@ async function getPoint(id: string) {
           type: true,
         },
       },
-  },
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
   })
   return point
 }
@@ -189,13 +196,25 @@ async function PointData({ id }: { id: string }) {
                     >
                       <Link href={`/point/${id}#comments`}>
                         <MessageSquare className="w-4 h-4 mr-2" />
-                        <span className="text-sm">40 comments</span>
+                        <span className="text-sm">{point._count.comments} comment{point._count.comments !== 1 ? 's' : ''}</span>
                       </Link>
                     </Button>
                   </div>
                 </div>
               </div>
             </Card>
+
+            {/* Comments Section */}
+            <div id="comments" className="mt-8">
+              <Card className="border shadow-sm rounded-xl">
+                <div className="p-6">
+                  <h2 className="text-xl font-semibold mb-6">Comments</h2>
+                  <CommentForm pointId={id} />
+                  <Separator className="my-6" />
+                  <CommentList pointId={id} />
+                </div>
+              </Card>
+            </div>
           </div>
 
           {/* Zone Info Sidebar */}

@@ -21,6 +21,7 @@ model User {
   sessions      Session[]
   zones         Zone[]
   points        Point[]
+  comments      Comment[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   Boost         Boost[]
@@ -101,8 +102,23 @@ model Point {
   zone        Zone?    @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   subName     String?
   Boost       Boost[]
+  comments    Comment[]
 
   @@index([title])
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String   @db.ObjectId
+  pointId   String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  point     Point    @relation(fields: [pointId], references: [id], onDelete: Cascade)
+
+  @@index([pointId])
+  @@index([userId])
 }
 
 model Boost {
@@ -151,4 +167,5 @@ enum InviteStatus {
   DECLINED
   EXPIRED
 }
+
 
