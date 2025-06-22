@@ -27,6 +27,7 @@ import { getUserStats, getUserActivity, getUserZones, getUserProfile, updateProf
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
 import SubmitButton from "@/app/components/SubmitButton"
+import ProfileSkeleton from "@/app/components/ProfileSkeleton"
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
@@ -173,23 +174,11 @@ export default function ProfilePage() {
   }, [status, router])
 
   if (status === "loading") {
-    return (
-      <div className="container max-w-6xl mx-auto py-8 px-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-muted-foreground">Loading profile...</h1>
-        </div>
-      </div>
-    )
+    return <ProfileSkeleton />
   }
 
   if (status === "unauthenticated") {
-    return (
-      <div className="container max-w-6xl mx-auto py-8 px-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-muted-foreground">Please sign in to view your profile</h1>
-        </div>
-      </div>
-    )
+    return <ProfileSkeleton />
   }
 
   const handleSave = async (formData: FormData) => {
