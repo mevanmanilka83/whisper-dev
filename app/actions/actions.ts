@@ -106,7 +106,7 @@ export async function deleteZone(prevState: ActionState, formData: FormData) {
       message: "Zone deleted successfully",
       error: false,
     };
-  } catch (e) {
+  } catch {
     return {
       message: "Failed to delete zone",
       error: true,
@@ -202,7 +202,7 @@ export async function updateDescription(
       success: true,
       message: "Description updated successfully",
     };
-  } catch (e) {
+  } catch {
     return { error: "Failed to update description" };
   }
 }
@@ -378,7 +378,7 @@ export async function handleBoost(formData: FormData) {
 
     // Refresh the UI
     revalidatePath("/");
-  } catch (error) {
+  } catch {
 
     revalidatePath("/");
   }
@@ -714,7 +714,7 @@ export async function leaveZone(formData: FormData): Promise<{ error?: string; s
 
     revalidatePath(`/zone/${zoneId}`);
     return { success: true, message: "Successfully left the zone" };
-  } catch (error) {
+  } catch {
     return { error: "Failed to leave zone" };
   }
 }
@@ -746,7 +746,7 @@ export async function createComment(formData: FormData): Promise<{ error?: strin
     if (!point) {
       return { error: "Point not found" };
     }
-    const comment = await prisma.comment.create({
+    await prisma.comment.create({
       data: {
         content: content,
         userId: session.user.id,
@@ -756,7 +756,7 @@ export async function createComment(formData: FormData): Promise<{ error?: strin
 
     revalidatePath(`/point/${pointId}`);
     return { success: true, message: "Comment added successfully" };
-  } catch (error) {
+  } catch {
     return { error: "Failed to create comment" };
   }
 }
@@ -785,12 +785,12 @@ export async function getCommentCounts(pointIds: string[]): Promise<Record<strin
     });
 
     return countMap;
-  } catch (error) {
+  } catch {
 
     return {};
   }
 }
 
 
-}
+
 
