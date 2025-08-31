@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { ThemeToggle } from "./theme-toggle"
@@ -41,13 +40,11 @@ export default function Navbar() {
             ) : (
               <div>
               <Link href="/sign-in">
-        <Button
-                  variant="default"
-                  size="sm"
-                  className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200 transform-none"
+                <button
+                  className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium h-8 rounded-md gap-1.5 px-3 relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200 transform-none text-primary-foreground"
                 >
                   <span className="relative z-10">Sign In</span>
-        </Button>
+                </button>
               </Link>
               </div>
             )}
