@@ -36,7 +36,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
   debug: process.env.NODE_ENV === 'development',
   basePath: "/api/auth",
-  url: process.env.NEXTAUTH_URL,
   session: {
     strategy: "database",
     maxAge: 30 * 24 * 60 * 60, // 30 days
