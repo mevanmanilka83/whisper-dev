@@ -31,7 +31,7 @@ export default function CommentList({ pointId, refreshTrigger }: CommentListProp
         const data = await response.json()
         setComments(data.comments || [])
       }
-    } catch (error) {
+    } catch {
 
     } finally {
       setLoading(false)

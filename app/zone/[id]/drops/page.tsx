@@ -76,7 +76,7 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
           const response = await fetch(`/api/zones/${resolvedParams.id}/membership`)
           const data = await response.json()
           setIsMember(data.isMember)
-        } catch (error) {
+        } catch {
 
           setIsMember(false)
         }

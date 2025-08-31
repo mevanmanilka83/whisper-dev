@@ -62,7 +62,7 @@ async function getZoneData(id: string) {
     }
 
     return null
-  } catch (error) {
+  } catch {
 
     return null
   }
@@ -91,7 +91,7 @@ async function checkZoneMembership(zoneId: string, userId: string) {
     })
 
     return !!membership
-  } catch (error) {
+  } catch {
 
     return false
   }
@@ -153,7 +153,7 @@ async function updateDescription(formData: FormData) {
     })
 
     return { success: true }
-  } catch (error) {
+  } catch {
 
     return { error: "Failed to update description" }
   }
@@ -184,7 +184,7 @@ async function ShowZoneItems({ zoneId, page }: { zoneId: string; page: number })
               try {
                 parsedContent =
                   typeof point.textContent === "string" ? JSON.parse(point.textContent) : point.textContent
-              } catch (e) {
+              } catch {
 
               }
             }

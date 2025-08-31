@@ -39,7 +39,7 @@ export default function PointViewer({ point }: PointViewerProps) {
     if (point.textContent) {
       jsonContent = JSON.parse(point.textContent);
     }
-  } catch (e) {
+  } catch {
 
   }
 

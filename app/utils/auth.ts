@@ -33,10 +33,34 @@ const customPrismaAdapter: Adapter = {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: customPrismaAdapter,
   secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true,
+  debug: process.env.NODE_ENV === 'development',
+  session: {
+    strategy: "database",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    pkceCodeVerifier: {
+      name: `next-auth.pkce.code_verifier`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
+  },
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
     GitHub({
       clientId: process.env.GITHUB_ID!,
@@ -51,39 +75,50 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return session
     },
-    signIn: async ({ user, account }) => {
-      if (!user.email) return false;
-
-      // Get all accounts associated with the email
-      const existingUser = await prisma.user.findFirst({
-        where: { email: user.email },
-        include: { accounts: true },
-      });
-
-      if (existingUser) {
-        // If this is a different provider but same email, link the accounts
-        const existingAccount = existingUser.accounts.find(
-          (acc) => acc.provider === account?.provider
-        );
-
-        if (!existingAccount) {
-          await prisma.account.create({
-            data: {
-              userId: existingUser.id,
-              type: account?.type || "oauth",
-              provider: account?.provider || "",
-              providerAccountId: account?.providerAccountId || "",
-              access_token: account?.access_token,
-              token_type: account?.token_type,
-              scope: account?.scope,
-              id_token: account?.id_token,
-            },
-          });
-        }
-        return true;
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id
       }
+      return token
+    },
+    signIn: async ({ user, account }) => {
+      try {
+        if (!user.email) return false;
 
-      return true;
+        // Get all accounts associated with the email
+        const existingUser = await prisma.user.findFirst({
+          where: { email: user.email },
+          include: { accounts: true },
+        });
+
+        if (existingUser) {
+          // If this is a different provider but same email, link the accounts
+          const existingAccount = existingUser.accounts.find(
+            (acc) => acc.provider === account?.provider
+          );
+
+          if (!existingAccount) {
+            await prisma.account.create({
+              data: {
+                userId: existingUser.id,
+                type: account?.type || "oauth",
+                provider: account?.provider || "",
+                providerAccountId: account?.providerAccountId || "",
+                access_token: account?.access_token,
+                token_type: account?.token_type,
+                scope: account?.scope,
+                id_token: account?.id_token,
+              },
+            });
+          }
+          return true;
+        }
+
+        return true;
+      } catch (error) {
+        console.error("Error in signIn callback:", error);
+        return false;
+      }
     },
   },
 });

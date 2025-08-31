@@ -96,8 +96,7 @@ export async function getUserStats(userId: string) {
     
     return result
     
-  } catch (error) {
-
+  } catch {
     return {
       points: 0,
       zones: 0,
@@ -154,7 +153,7 @@ export async function getUserActivity(userId: string) {
     
     return result
     
-  } catch (error) {
+  } catch {
 
     return []
   }
@@ -198,7 +197,7 @@ export async function getUserZones(userId: string) {
     
     return zones
     
-  } catch (error) {
+  } catch {
 
     return []
   }
@@ -259,8 +258,7 @@ export async function getUserProfile(userId: string) {
     }
     
     return user
-  } catch (error) {
-
+  } catch {
     return null
   }
 }

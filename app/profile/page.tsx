@@ -133,7 +133,7 @@ export default function ProfilePage() {
       setActivity(combinedActivity)
       setUserZones(zonesData || [])
       
-    } catch (error) {
+    } catch {
       setStats({
         points: 0,
         zones: 0,
@@ -213,7 +213,7 @@ export default function ProfilePage() {
       toast.success("Profile link copied to clipboard!", {
         position: "bottom-right",
       })
-    } catch (error) {
+    } catch {
       toast.error("Failed to copy profile link", {
         position: "bottom-right",
       })

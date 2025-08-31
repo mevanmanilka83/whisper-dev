@@ -61,7 +61,7 @@ export async function GET(
     })
 
     return NextResponse.json({ invitations })
-  } catch (error) {
+  } catch {
 
     return NextResponse.json(
       { error: "Internal server error" },
@@ -169,7 +169,7 @@ export async function POST(
     })
 
     return NextResponse.json({ invitation })
-  } catch (error) {
+  } catch {
 
     return NextResponse.json(
       { error: "Internal server error" },

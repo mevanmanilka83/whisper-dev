@@ -24,7 +24,7 @@ export default function ZoneMembership({ zoneName }: ZoneMembershipProps) {
           const response = await fetch(`/api/zones/${zoneName}/membership`)
           const data = await response.json()
           setIsMember(data.isMember)
-        } catch (error) {
+        } catch {
 
           setIsMember(false)
         }

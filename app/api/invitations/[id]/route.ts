@@ -72,7 +72,7 @@ export async function PATCH(
 
       return NextResponse.json({ message: "Invitation declined" })
     }
-  } catch (error) {
+  } catch {
 
     return NextResponse.json(
       { error: "Internal server error" },

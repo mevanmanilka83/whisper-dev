@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     })
 
     return NextResponse.json({ comments })
-  } catch (error) {
+  } catch {
 
     return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 })
   }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({ comment }, { status: 201 })
-  } catch (error) {
+  } catch {
 
     return NextResponse.json({ error: "Failed to create comment" }, { status: 500 })
   }

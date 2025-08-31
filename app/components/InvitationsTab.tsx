@@ -34,7 +34,7 @@ export default function InvitationsTab() {
         setInvitations(invitationsResult.invitations)
         setZoneOwnerRequests(zoneOwnerRequestsResult.joinRequests)
         setZoneMemberships(membershipsResult.memberships)
-    } catch (error) {
+    } catch {
         toast.error("Failed to load invitations.")
 
     } finally {

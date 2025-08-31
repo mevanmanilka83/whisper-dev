@@ -57,7 +57,7 @@ export default function ClientShowItems({ page }: { page: number }) {
 
         setData(posts)
         setCount(result.count || 0)
-      } catch (error) {
+      } catch {
 
       } finally {
         setLoading(false)
@@ -92,7 +92,7 @@ export default function ClientShowItems({ page }: { page: number }) {
                 try {
                   parsedContent =
                     typeof post.textContent === "string" ? JSON.parse(post.textContent) : post.textContent
-                } catch (e) {
+                } catch {
 
                 }
               }

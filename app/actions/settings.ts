@@ -42,7 +42,7 @@ export async function updateSettings(formData: FormData) {
 
     revalidatePath("/settings")
     return { success: true, settings }
-  } catch (error) {
+  } catch {
 
     return { error: "Failed to update settings" }
   }
@@ -148,7 +148,7 @@ export async function declineInvitation({ invitationId }: { invitationId: string
 
         revalidatePath("/settings")
         return { success: true }
-    } catch (error) {
+    } catch {
 
         return { error: "An unexpected error occurred." }
     }
@@ -167,7 +167,7 @@ export async function deleteAccount() {
     })
 
     return { success: true }
-  } catch (error) {
+  } catch {
 
     return { error: "Failed to delete account" }
   }

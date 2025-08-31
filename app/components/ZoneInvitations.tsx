@@ -36,7 +36,7 @@ export default function ZoneInvitations({ zoneName, isOwner }: ZoneInvitationsPr
         const data = await response.json()
         setInvitations(data.invitations || [])
       }
-    } catch (error) {
+    } catch {
 
     } finally {
       setLoading(false)

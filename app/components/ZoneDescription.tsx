@@ -33,7 +33,7 @@ export function ZoneDescriptionpage({
             result.error || "Failed to update description. Please try again.",
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("Error", {
         description: "An unexpected error occurred. Please try again.",
       });

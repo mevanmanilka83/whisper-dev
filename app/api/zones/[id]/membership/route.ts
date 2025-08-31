@@ -45,7 +45,7 @@ export async function GET(
       isOwner: false,
       joinedAt: membership?.joinedAt 
     })
-  } catch (error) {
+  } catch {
 
     return NextResponse.json(
       { isMember: false, error: "Internal server error" },
