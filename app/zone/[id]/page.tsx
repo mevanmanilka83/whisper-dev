@@ -63,7 +63,7 @@ async function getZoneData(id: string) {
 
     return null
   } catch (error) {
-    console.error("Error fetching zone:", error)
+
     return null
   }
 }
@@ -92,7 +92,7 @@ async function checkZoneMembership(zoneId: string, userId: string) {
 
     return !!membership
   } catch (error) {
-    console.error("Error checking zone membership:", error)
+
     return false
   }
 }
@@ -154,7 +154,7 @@ async function updateDescription(formData: FormData) {
 
     return { success: true }
   } catch (error) {
-    console.error("Failed to update description:", error)
+
     return { error: "Failed to update description" }
   }
 }
@@ -185,7 +185,7 @@ async function ShowZoneItems({ zoneId, page }: { zoneId: string; page: number })
                 parsedContent =
                   typeof point.textContent === "string" ? JSON.parse(point.textContent) : point.textContent
               } catch (e) {
-                console.error(`Error parsing content for point ${point.id}:`, e)
+
               }
             }
 

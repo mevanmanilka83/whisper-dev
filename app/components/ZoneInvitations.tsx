@@ -37,7 +37,7 @@ export default function ZoneInvitations({ zoneName, isOwner }: ZoneInvitationsPr
         setInvitations(data.invitations || [])
       }
     } catch (error) {
-      console.error("Error fetching invitations:", error)
+
     } finally {
       setLoading(false)
     }

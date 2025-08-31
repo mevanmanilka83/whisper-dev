@@ -134,7 +134,6 @@ export default function ProfilePage() {
       setUserZones(zonesData || [])
       
     } catch (error) {
-      console.error("Error fetching user data:", error)
       setStats({
         points: 0,
         zones: 0,
@@ -215,7 +214,6 @@ export default function ProfilePage() {
         position: "bottom-right",
       })
     } catch (error) {
-      console.error("Failed to copy profile link:", error)
       toast.error("Failed to copy profile link", {
         position: "bottom-right",
       })

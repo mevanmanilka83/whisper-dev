@@ -40,7 +40,7 @@ export default function PointViewer({ point }: PointViewerProps) {
       jsonContent = JSON.parse(point.textContent);
     }
   } catch (e) {
-    console.error("Error parsing point content:", e);
+
   }
 
   const editor = useEditor({

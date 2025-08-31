@@ -77,7 +77,7 @@ export default function CreatePostRoute({ params }: { params: Promise<{ id: stri
           const data = await response.json()
           setIsMember(data.isMember)
         } catch (error) {
-          console.error("Error checking membership:", error)
+
           setIsMember(false)
         }
       } else {

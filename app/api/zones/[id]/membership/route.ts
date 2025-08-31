@@ -46,7 +46,7 @@ export async function GET(
       joinedAt: membership?.joinedAt 
     })
   } catch (error) {
-    console.error("Error checking membership:", error)
+
     return NextResponse.json(
       { isMember: false, error: "Internal server error" },
       { status: 500 }

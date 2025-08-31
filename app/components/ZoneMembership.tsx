@@ -25,7 +25,7 @@ export default function ZoneMembership({ zoneName }: ZoneMembershipProps) {
           const data = await response.json()
           setIsMember(data.isMember)
         } catch (error) {
-          console.error("Error checking membership:", error)
+
           setIsMember(false)
         }
       } else {

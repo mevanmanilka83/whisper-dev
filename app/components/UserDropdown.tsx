@@ -43,7 +43,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
           setInvitationCount(count)
         } catch (error) {
             // Silently fail, don't bother the user with notification errors
-            console.error("Failed to check notification status:", error)
+
         }
       }
 
@@ -52,7 +52,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
           const { memberships } = await getUserZoneMemberships()
           setCollaborations(memberships)
         } catch (error) {
-          console.error("Failed to load collaborations:", error)
+
         } finally {
           setIsLoadingCollaborations(false)
         }
@@ -63,7 +63,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
           const { zones } = await getUserOwnedZones()
           setOwnedZones(zones)
         } catch (error) {
-          console.error("Failed to load owned zones:", error)
+
         } finally {
           setIsLoadingOwnedZones(false)
         }

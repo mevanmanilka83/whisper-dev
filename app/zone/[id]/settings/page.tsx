@@ -47,7 +47,7 @@ export default function ZoneSettingsPage({ params }: { params: Promise<{ id: str
           router.push("/")
         }
       } catch (error) {
-        console.error("Error fetching zone data:", error)
+
         toast.error("Failed to load zone data")
         router.push("/")
       } finally {
@@ -77,7 +77,7 @@ export default function ZoneSettingsPage({ params }: { params: Promise<{ id: str
         router.push("/")
       }
     } catch (error) {
-      console.error("Error deleting zone:", error)
+
       toast.error("Failed to delete zone")
     } finally {
       setIsDeleting(false)

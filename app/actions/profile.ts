@@ -97,7 +97,7 @@ export async function getUserStats(userId: string) {
     return result
     
   } catch (error) {
-    console.error("Error fetching user stats:", error)
+
     return {
       points: 0,
       zones: 0,
@@ -155,7 +155,7 @@ export async function getUserActivity(userId: string) {
     return result
     
   } catch (error) {
-    console.error("Error fetching user activity:", error)
+
     return []
   }
 }
@@ -199,7 +199,7 @@ export async function getUserZones(userId: string) {
     return zones
     
   } catch (error) {
-    console.error("Error fetching user zones:", error)
+
     return []
   }
 }
@@ -207,11 +207,11 @@ export async function getUserZones(userId: string) {
 export async function getUserProfile(userId: string) {
   try {
     if (!userId) {
-      console.log("getUserProfile: No userId provided")
+
       return null
     }
     
-    console.log("getUserProfile: Looking for user with ID:", userId)
+
     
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -229,10 +229,10 @@ export async function getUserProfile(userId: string) {
       }
     })
     
-    console.log("getUserProfile result:", user)
+
     
     if (!user) {
-      console.log("getUserProfile: User not found, trying to find by email...")
+
       
       // Try to find user by email if ID doesn't work
       const session = await auth()
@@ -253,14 +253,14 @@ export async function getUserProfile(userId: string) {
           }
         })
         
-        console.log("getUserProfile by email result:", userByEmail)
+
         return userByEmail
       }
     }
     
     return user
   } catch (error) {
-    console.error("Error fetching user profile:", error)
+
     return null
   }
 }
@@ -357,8 +357,7 @@ export async function getPendingInvitations() {
     },
   })
 
-  console.log("getPendingInvitations - session user ID:", session.user.id)
-  console.log("getPendingInvitations - raw invitations:", invitations)
+
 
   return { invitations }
 }
@@ -419,10 +418,7 @@ export async function getZoneOwnerJoinRequests() {
   // Filter for join requests where inviterId equals inviteeId
   const filteredJoinRequests = joinRequests.filter(request => request.inviterId === request.inviteeId)
 
-  console.log("getZoneOwnerJoinRequests - session user ID:", session.user.id)
-  console.log("getZoneOwnerJoinRequests - owned zones:", ownedZones)
-  console.log("getZoneOwnerJoinRequests - raw join requests:", joinRequests)
-  console.log("getZoneOwnerJoinRequests - filtered join requests:", filteredJoinRequests)
+
 
   return { joinRequests: filteredJoinRequests }
 } 

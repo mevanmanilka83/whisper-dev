@@ -62,7 +62,7 @@ export async function GET(
 
     return NextResponse.json({ invitations })
   } catch (error) {
-    console.error("Error fetching invitations:", error)
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -170,7 +170,7 @@ export async function POST(
 
     return NextResponse.json({ invitation })
   } catch (error) {
-    console.error("Error creating invitation:", error)
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

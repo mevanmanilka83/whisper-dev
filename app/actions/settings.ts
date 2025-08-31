@@ -43,7 +43,7 @@ export async function updateSettings(formData: FormData) {
     revalidatePath("/settings")
     return { success: true, settings }
   } catch (error) {
-    console.error("Error updating settings:", error)
+
     return { error: "Failed to update settings" }
   }
 }
@@ -106,7 +106,7 @@ export async function acceptInvitation({ invitationId }: { invitationId: string 
         });
         return { error: "User is already a member of this zone. The invitation has been declined." }
     }
-    console.error("Error accepting invitation:", error)
+
     return { error: "An unexpected error occurred." }
   }
 }
@@ -149,7 +149,7 @@ export async function declineInvitation({ invitationId }: { invitationId: string
         revalidatePath("/settings")
         return { success: true }
     } catch (error) {
-        console.error("Error declining invitation:", error)
+
         return { error: "An unexpected error occurred." }
     }
 }
@@ -168,7 +168,7 @@ export async function deleteAccount() {
 
     return { success: true }
   } catch (error) {
-    console.error("Error deleting account:", error)
+
     return { error: "Failed to delete account" }
   }
 } 

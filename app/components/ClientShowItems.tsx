@@ -58,7 +58,7 @@ export default function ClientShowItems({ page }: { page: number }) {
         setData(posts)
         setCount(result.count || 0)
       } catch (error) {
-        console.error("Error fetching data:", error)
+
       } finally {
         setLoading(false)
       }
@@ -93,7 +93,7 @@ export default function ClientShowItems({ page }: { page: number }) {
                   parsedContent =
                     typeof post.textContent === "string" ? JSON.parse(post.textContent) : post.textContent
                 } catch (e) {
-                  console.error(`Error parsing content for post ${post.id}:`, e)
+
                 }
               }
 

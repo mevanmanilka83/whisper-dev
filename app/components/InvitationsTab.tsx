@@ -36,7 +36,7 @@ export default function InvitationsTab() {
         setZoneMemberships(membershipsResult.memberships)
     } catch (error) {
         toast.error("Failed to load invitations.")
-        console.error(error)
+
     } finally {
         setIsLoading(false)
     }

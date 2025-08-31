@@ -32,7 +32,7 @@ export default function CommentList({ pointId, refreshTrigger }: CommentListProp
         setComments(data.comments || [])
       }
     } catch (error) {
-      console.error("Error fetching comments:", error)
+
     } finally {
       setLoading(false)
     }

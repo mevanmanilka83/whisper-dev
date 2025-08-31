@@ -37,7 +37,7 @@ export function ZoneDescriptionpage({
       toast.error("Error", {
         description: "An unexpected error occurred. Please try again.",
       });
-      console.error(error);
+
     }
   }
 

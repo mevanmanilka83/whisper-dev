@@ -31,7 +31,7 @@ export default function CopyLink({
       // Reset the copied state after 2 seconds
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error("Failed to copy link:", error);
+
       toast.error("Failed to copy link");
     }
   };

@@ -73,7 +73,7 @@ export async function PATCH(
       return NextResponse.json({ message: "Invitation declined" })
     }
   } catch (error) {
-    console.error("Error handling invitation:", error)
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(countMap)
   } catch (error) {
-    console.error("Error getting comment counts:", error)
+
     return NextResponse.json({ error: "Failed to get comment counts" }, { status: 500 })
   }
 } 

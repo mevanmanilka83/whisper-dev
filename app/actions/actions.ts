@@ -107,7 +107,6 @@ export async function deleteZone(prevState: ActionState, formData: FormData) {
       error: false,
     };
   } catch (e) {
-    console.error(e);
     return {
       message: "Failed to delete zone",
       error: true,
@@ -157,7 +156,6 @@ export async function updateZone(prevState: ActionState, formData: FormData) {
         };
       }
     }
-    console.error(e);
     return {
       message: "Failed to update zone",
       error: true,
@@ -205,7 +203,6 @@ export async function updateDescription(
       message: "Description updated successfully",
     };
   } catch (e) {
-    console.error(e);
     return { error: "Failed to update description" };
   }
 }
@@ -271,7 +268,7 @@ export async function createPoint(
       pointId: point.id,
     };
   } catch (e) {
-    console.error("Error creating point:", e);
+
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       if (e.code === "P2002") {
         return {
@@ -382,7 +379,7 @@ export async function handleBoost(formData: FormData) {
     // Refresh the UI
     revalidatePath("/");
   } catch (error) {
-    console.error("Error handling boost/reduce action:", error);
+
     revalidatePath("/");
   }
 }
@@ -469,7 +466,7 @@ export async function sendCollaborationInvite(formData: FormData): Promise<{ err
       message: `Collaboration invite sent to ${inviteeEmail}!`,
     };
   } catch (e) {
-    console.error("Error sending collaboration invite:", e);
+
     return { error: e instanceof Error ? e.message : "Failed to send collaboration invite" };
   }
 }
@@ -564,7 +561,7 @@ export async function requestToJoinZone(formData: FormData): Promise<{ error?: s
       message: `Join request sent to zone owner!`,
     };
   } catch (e) {
-    console.error("Error requesting to join zone:", e);
+
     return { error: e instanceof Error ? e.message : "Failed to request to join zone" };
   }
 }
@@ -628,7 +625,7 @@ export async function acceptInvitation(formData: FormData): Promise<{ error?: st
       message: "Invitation accepted! You are now a collaborator.",
     };
   } catch (e) {
-    console.error("Error accepting invitation:", e);
+
     return { error: e instanceof Error ? e.message : "Failed to accept invitation" };
   }
 }
@@ -681,7 +678,7 @@ export async function declineInvitation(formData: FormData): Promise<{ error?: s
       message: "Invitation declined.",
     };
   } catch (e) {
-    console.error("Error declining invitation:", e);
+
     return { error: e instanceof Error ? e.message : "Failed to decline invitation" };
   }
 }
@@ -718,35 +715,26 @@ export async function leaveZone(formData: FormData): Promise<{ error?: string; s
     revalidatePath(`/zone/${zoneId}`);
     return { success: true, message: "Successfully left the zone" };
   } catch (error) {
-    console.error("Error leaving zone:", error);
     return { error: "Failed to leave zone" };
   }
 }
 
 export async function createComment(formData: FormData): Promise<{ error?: string; success?: boolean; message?: string }> {
-  console.log("createComment: Action called")
-  
   const session = await auth();
-  console.log("createComment: Session:", session)
 
   if (!session?.user?.id) {
-    console.log("createComment: Not authenticated")
     return { error: "Not authenticated" };
   }
 
   try {
     const content = formData.get("content")?.toString().trim();
     const pointId = formData.get("pointId")?.toString().trim();
-    
-    console.log("createComment: Content:", content, "PointId:", pointId)
 
     if (!content || !pointId) {
-      console.log("createComment: Missing content or pointId")
       return { error: "Content and point ID are required" };
     }
 
     if (content.length === 0) {
-      console.log("createComment: Empty content")
       return { error: "Comment cannot be empty" };
     }
 
@@ -754,15 +742,10 @@ export async function createComment(formData: FormData): Promise<{ error?: strin
     const point = await prisma.point.findUnique({
       where: { id: pointId },
     });
-    
-    console.log("createComment: Point found:", !!point)
 
     if (!point) {
-      console.log("createComment: Point not found")
       return { error: "Point not found" };
     }
-
-    console.log("createComment: Creating comment in database")
     const comment = await prisma.comment.create({
       data: {
         content: content,
@@ -770,13 +753,10 @@ export async function createComment(formData: FormData): Promise<{ error?: strin
         pointId: pointId,
       },
     });
-    
-    console.log("createComment: Comment created successfully:", comment.id)
 
     revalidatePath(`/point/${pointId}`);
     return { success: true, message: "Comment added successfully" };
   } catch (error) {
-    console.error("Error creating comment:", error);
     return { error: "Failed to create comment" };
   }
 }
@@ -806,8 +786,11 @@ export async function getCommentCounts(pointIds: string[]): Promise<Record<strin
 
     return countMap;
   } catch (error) {
-    console.error("Error getting comment counts:", error);
+
     return {};
   }
+}
+
+
 }
 
