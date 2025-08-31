@@ -44,7 +44,7 @@ export default function Navbar() {
         <Button
                   variant="default"
                   size="sm"
-                  className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200"
+                  className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200 transform-none"
                 >
                   <span className="relative z-10">Sign In</span>
         </Button>
