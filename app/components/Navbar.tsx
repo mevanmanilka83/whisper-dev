@@ -41,7 +41,8 @@ export default function Navbar() {
               <div>
               <Link href="/sign-in">
                 <button
-                  className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium h-8 rounded-md gap-1.5 px-3 relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 shadow-md text-primary-foreground"
+                  className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium h-8 rounded-md gap-1.5 px-3 relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 shadow-md text-primary-foreground no-hover no-transition"
+                  style={{ transform: 'none !important', transition: 'none !important' }}
                 >
                   <span className="relative z-10">Sign In</span>
                 </button>

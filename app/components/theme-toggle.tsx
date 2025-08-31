@@ -11,8 +11,7 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="sm"
-      className="h-10 w-10 px-0 hover:bg-accent/50 transition-all duration-200 hover:shadow-md rounded-full transform-none hover:scale-100 scale-100"
-      style={{ transform: 'scale(1) !important' }}
+      className="h-10 w-10 px-0 rounded-full"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
     >
       <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
